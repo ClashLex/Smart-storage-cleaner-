@@ -1,0 +1,6 @@
+{
+  "name": "Smart Storage Cleaner AI",
+  "description": "On-device AI privacy-first Android storage cleaner app to find duplicate photos, blurry images, and clean junk.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
