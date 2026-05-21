@@ -19,6 +19,7 @@ import com.example.ui.screens.*
 import com.example.ui.theme.MyApplicationTheme
 import com.example.ui.viewmodel.AuthViewModel
 import com.example.ui.viewmodel.CleanerViewModel
+import com.example.ui.viewmodel.SettingsViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -28,6 +29,10 @@ class MainActivity : ComponentActivity() {
 
     private val cleanerViewModel: CleanerViewModel by viewModels {
         CleanerViewModel.provideFactory()
+    }
+
+    private val settingsViewModel: SettingsViewModel by viewModels {
+        SettingsViewModel.provideFactory()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,14 +102,19 @@ class MainActivity : ComponentActivity() {
 
                         composable(Routes.SETTINGS) {
                             SettingsScreen(
+                                settingsViewModel = settingsViewModel,
                                 onNavigateBack = {
                                     navController.popBackStack()
+                                },
+                                onNavigateToPaywall = {
+                                    navController.navigate(Routes.PAYWALL)
                                 }
                             )
                         }
 
                         composable(Routes.PAYWALL) {
                             PaywallScreen(
+                                authViewModel = authViewModel,
                                 onDismiss = {
                                     navController.popBackStack()
                                 }
