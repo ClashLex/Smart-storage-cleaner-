@@ -18,11 +18,16 @@ import com.example.ui.navigation.Routes
 import com.example.ui.screens.*
 import com.example.ui.theme.MyApplicationTheme
 import com.example.ui.viewmodel.AuthViewModel
+import com.example.ui.viewmodel.CleanerViewModel
 
 class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels {
         AuthViewModel.provideFactory()
+    }
+
+    private val cleanerViewModel: CleanerViewModel by viewModels {
+        CleanerViewModel.provideFactory()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +67,7 @@ class MainActivity : ComponentActivity() {
 
                         composable(Routes.HOME) {
                             HomeScreen(
+                                cleanerViewModel = cleanerViewModel,
                                 onNavigateToDuplicates = {
                                     navController.navigate(Routes.DUPLICATES)
                                 },
@@ -82,6 +88,7 @@ class MainActivity : ComponentActivity() {
 
                         composable(Routes.DUPLICATES) {
                             DuplicatesScreen(
+                                cleanerViewModel = cleanerViewModel,
                                 onNavigateBack = {
                                     navController.popBackStack()
                                 }

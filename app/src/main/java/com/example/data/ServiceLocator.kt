@@ -27,6 +27,13 @@ object ServiceLocator {
         )
     }
 
+    val photoCleanerRepository: PhotoCleanerRepository by lazy {
+        PhotoCleanerRepository(
+            context = requireContext(),
+            photoEmbeddingDao = appDatabase.photoEmbeddingDao()
+        )
+    }
+
     fun initialize(context: Context) {
         if (applicationContext == null) {
             applicationContext = context.applicationContext
