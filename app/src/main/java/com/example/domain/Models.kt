@@ -53,3 +53,13 @@ data class ScanSession(
     val totalSizeMB: Long,
     val timestamp: Long = System.currentTimeMillis()
 )
+
+@Keep
+data class JunkItem(
+    val id: String,
+    val name: String,
+    val size: Long,
+    val detail: String,
+    val dateString: String,
+    val checked: Boolean = true
+)

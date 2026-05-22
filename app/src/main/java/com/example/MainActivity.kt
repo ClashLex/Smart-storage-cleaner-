@@ -87,6 +87,9 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(Routes.SIGN_IN) {
                                         popUpTo(Routes.HOME) { inclusive = true }
                                     }
+                                },
+                                onNavigateToJunk = { category ->
+                                    navController.navigate(Routes.buildJunkRoute(category))
                                 }
                             )
                         }
@@ -116,6 +119,22 @@ class MainActivity : ComponentActivity() {
                             PaywallScreen(
                                 authViewModel = authViewModel,
                                 onDismiss = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                        composable(
+                            route = Routes.JUNK_CLEANER,
+                            arguments = listOf(androidx.navigation.navArgument("category") {
+                                type = androidx.navigation.NavType.StringType
+                            })
+                        ) { backStackEntry ->
+                            val category = backStackEntry.arguments?.getString("category") ?: "WhatsApp"
+                            JunkCleanerScreen(
+                                initialCategory = category,
+                                cleanerViewModel = cleanerViewModel,
+                                onNavigateBack = {
                                     navController.popBackStack()
                                 }
                             )

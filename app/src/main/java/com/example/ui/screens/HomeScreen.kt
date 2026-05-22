@@ -37,6 +37,7 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToPaywall: () -> Unit,
     onLogout: () -> Unit,
+    onNavigateToJunk: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -45,6 +46,15 @@ fun HomeScreen(
     val duplicateGroups by cleanerViewModel.duplicateGroups.collectAsState()
     val blurryPhotos by cleanerViewModel.blurryPhotos.collectAsState()
 
+    val totalReclaimedBytes by cleanerViewModel.totalReclaimedBytes.collectAsState()
+    val whatsappItems by cleanerViewModel.whatsappItems.collectAsState()
+    val apkItems by cleanerViewModel.apkItems.collectAsState()
+    val cacheItems by cleanerViewModel.cacheItems.collectAsState()
+
+    val whatsappSize = whatsappItems.sumOf { it.size }
+    val apkSize = apkItems.sumOf { it.size }
+    val cacheSize = cacheItems.sumOf { it.size }
+
     // Base storage calculations
     val totalCapacity = 128L * 1024L * 1024L * 1024L // 128 GB
     val originalUsedBytes = 115200000000L // Baseline (~107.2 GB used of 128 GB)
@@ -52,7 +62,7 @@ fun HomeScreen(
     // Calculate dynamic savings reclaimed
     val initialMockTotalBytes = 72263420L // Approx 68.91 MB of original mock scan
     val currentMockTotalBytes = allPhotos.sumOf { it.fileSize }
-    val cleanedBytesDelta = (initialMockTotalBytes - currentMockTotalBytes).coerceAtLeast(0L)
+    val cleanedBytesDelta = (initialMockTotalBytes - currentMockTotalBytes).coerceAtLeast(0L) + totalReclaimedBytes
 
     val currentUsedBytes = originalUsedBytes - cleanedBytesDelta
     val currentAvailableBytes = totalCapacity - currentUsedBytes
@@ -397,8 +407,9 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f),
                         emoji = "💬",
                         category = "WhatsApp",
-                        savings = "4.2 GB",
-                        backgroundTint = Color(0xFF2E7D32)
+                        savings = formatFileSize(whatsappSize),
+                        backgroundTint = Color(0xFF2E7D32),
+                        onClick = { onNavigateToJunk("WhatsApp") }
                     )
 
                     // Blurry Media (Dynamic from scannings!)
@@ -411,7 +422,8 @@ fun HomeScreen(
                         } else {
                             "2.8 GB"
                         },
-                        backgroundTint = Color(0xFF1565C0)
+                        backgroundTint = Color(0xFF1565C0),
+                        onClick = { onNavigateToJunk("Blurry Media") }
                     )
                 }
 
@@ -426,8 +438,9 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f),
                         emoji = "⚙️",
                         category = "Old APKs",
-                        savings = if (scanState is ScanUiState.Scanned && allPhotos.none { it.fileName.contains("APK") }) "0 B" else "1.5 GB",
-                        backgroundTint = Color(0xFFE65100)
+                        savings = formatFileSize(apkSize),
+                        backgroundTint = Color(0xFFE65100),
+                        onClick = { onNavigateToJunk("Old APKs") }
                     )
 
                     // App Cache
@@ -435,8 +448,9 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f),
                         emoji = "🗑️",
                         category = "App Cache",
-                        savings = if (scanState is ScanUiState.Scanned) "120 MB" else "840 MB",
-                        backgroundTint = Color(0xFF6A1B9A)
+                        savings = formatFileSize(cacheSize),
+                        backgroundTint = Color(0xFF6A1B9A),
+                        onClick = { onNavigateToJunk("App Cache") }
                     )
                 }
             }
@@ -513,10 +527,14 @@ fun WasterGridCell(
     emoji: String,
     category: String,
     savings: String,
-    backgroundTint: Color
+    backgroundTint: Color,
+    onClick: () -> Unit
 ) {
     Card(
-        modifier = modifier.fillMaxHeight(),
+        modifier = modifier
+            .fillMaxHeight()
+            .testTag("waster_card_$category")
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = DarkSurface),
         shape = RoundedCornerShape(28.dp),
         border = BorderStroke(1.dp, Color(0x3BFFFFFF))

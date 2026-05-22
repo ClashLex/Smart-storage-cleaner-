@@ -7,6 +7,7 @@ import com.example.data.DuplicateGroup
 import com.example.data.PhotoCleanerRepository
 import com.example.data.ServiceLocator
 import com.example.data.database.PhotoEmbedding
+import com.example.domain.JunkItem
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -30,6 +31,19 @@ class CleanerViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    // Non-photo junk tracks (WhatsApp, Old APKs, App Cache)
+    private val _whatsappItems = MutableStateFlow<List<JunkItem>>(generateMockWhatsAppItems())
+    val whatsappItems: StateFlow<List<JunkItem>> = _whatsappItems.asStateFlow()
+
+    private val _apkItems = MutableStateFlow<List<JunkItem>>(generateMockApkItems())
+    val apkItems: StateFlow<List<JunkItem>> = _apkItems.asStateFlow()
+
+    private val _cacheItems = MutableStateFlow<List<JunkItem>>(generateMockCacheItems())
+    val cacheItems: StateFlow<List<JunkItem>> = _cacheItems.asStateFlow()
+
+    private val _totalReclaimedBytes = MutableStateFlow<Long>(0L)
+    val totalReclaimedBytes: StateFlow<Long> = _totalReclaimedBytes.asStateFlow()
 
     // Derived StateFlow: Automatically cluster duplicates reactively whenever the DB changes
     val duplicateGroups: StateFlow<List<DuplicateGroup>> = allPhotos
@@ -108,6 +122,89 @@ class CleanerViewModel(
         viewModelScope.launch {
             repository.deletePhotos(listOf(uri))
         }
+    }
+
+    fun toggleWhatsAppItem(id: String) {
+        _whatsappItems.value = _whatsappItems.value.map {
+            if (it.id == id) it.copy(checked = !it.checked) else it
+        }
+    }
+
+    fun toggleApkItem(id: String) {
+        _apkItems.value = _apkItems.value.map {
+            if (it.id == id) it.copy(checked = !it.checked) else it
+        }
+    }
+
+    fun toggleCacheItem(id: String) {
+        _cacheItems.value = _cacheItems.value.map {
+            if (it.id == id) it.copy(checked = !it.checked) else it
+        }
+    }
+
+    fun selectAllJunk(category: String, selected: Boolean) {
+        when (category) {
+            "WhatsApp" -> {
+                _whatsappItems.value = _whatsappItems.value.map { it.copy(checked = selected) }
+            }
+            "Old APKs" -> {
+                _apkItems.value = _apkItems.value.map { it.copy(checked = selected) }
+            }
+            "App Cache" -> {
+                _cacheItems.value = _cacheItems.value.map { it.copy(checked = selected) }
+            }
+        }
+    }
+
+    fun deleteWhatsAppItems(ids: List<String>) {
+        val currentList = _whatsappItems.value
+        val itemsToDelete = currentList.filter { it.id in ids }
+        val sizeFreed = itemsToDelete.sumOf { it.size }
+        _whatsappItems.value = currentList.filter { it.id !in ids }
+        _totalReclaimedBytes.value += sizeFreed
+    }
+
+    fun deleteApkItems(ids: List<String>) {
+        val currentList = _apkItems.value
+        val itemsToDelete = currentList.filter { it.id in ids }
+        val sizeFreed = itemsToDelete.sumOf { it.size }
+        _apkItems.value = currentList.filter { it.id !in ids }
+        _totalReclaimedBytes.value += sizeFreed
+    }
+
+    fun deleteCacheItems(ids: List<String>) {
+        val currentList = _cacheItems.value
+        val itemsToDelete = currentList.filter { it.id in ids }
+        val sizeFreed = itemsToDelete.sumOf { it.size }
+        _cacheItems.value = currentList.filter { it.id !in ids }
+        _totalReclaimedBytes.value += sizeFreed
+    }
+
+    private fun generateMockWhatsAppItems(): List<JunkItem> {
+        return listOf(
+            JunkItem("wa_1", "VID_20260515_182041.mp4", 1280000000L, "WhatsApp Video / Shared Multiple Times", "May 15, 2026"),
+            JunkItem("wa_2", "VID_20260422_WA0012.mp4", 980000000L, "WhatsApp Video / Forwarded Category", "Apr 22, 2026"),
+            JunkItem("wa_3", "IMG_Meme_Cat_Lovers.jpg", 18800000L, "WhatsApp Image / Meme Library", "May 20, 2026"),
+            JunkItem("wa_4", "WA_Audio_Note_781.opus", 15400000L, "WhatsApp Audio / Voice Note Cache", "May 19, 2026"),
+            JunkItem("wa_5", "WhatsApp_Backup_Stale.zip", 2215822000L, "WhatsApp Document / Stale Chat Backup", "Jan 12, 2026")
+        )
+    }
+
+    private fun generateMockApkItems(): List<JunkItem> {
+        return listOf(
+            JunkItem("apk_1", "com.whatsapp.android_2.26.15.apk", 820000000L, "Stale Installer / Download Directory", "May 12, 2014"),
+            JunkItem("apk_2", "facebook_lite_new.apk", 430000000L, "Local Dev Build / Leftover package", "May 01, 2026"),
+            JunkItem("apk_3", "temp_unsigned_debug.apk", 300000000L, "Android Gradle Build / Leftover debug build", "Apr 28, 2026")
+        )
+    }
+
+    private fun generateMockCacheItems(): List<JunkItem> {
+        return listOf(
+            JunkItem("cache_1", "Google Chrome Cache", 310000000L, "Cached image previews, scripts & styles", "Just now"),
+            JunkItem("cache_2", "YouTube Offline Buffer", 250000000L, "Temporary streaming block and media segments", "Just now"),
+            JunkItem("cache_3", "Spotify Music Artwork", 180000000L, "Cached PNG image albums / cover files", "Just now"),
+            JunkItem("cache_4", "Instagram Stories Preload", 100000000L, "Pre-fetched video stories and feed images", "Just now")
+        )
     }
 
     companion object {
