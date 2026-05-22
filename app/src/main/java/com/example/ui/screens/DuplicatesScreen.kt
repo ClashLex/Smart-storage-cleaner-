@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -71,7 +72,7 @@ fun DuplicatesScreen(
                         onClick = onNavigateBack,
                         modifier = Modifier.testTag("back_button")
                     ) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -248,7 +249,7 @@ fun DuplicatesScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         LinearProgressIndicator(
-                            progress = progress / 100f,
+                            progress = { progress / 100f },
                             color = CyberPrimary,
                             trackColor = DarkSurfaceVariant,
                             modifier = Modifier
@@ -414,7 +415,7 @@ fun DuplicateGroupCard(
             )
 
             Spacer(modifier = Modifier.height(10.dp))
-            Divider(color = Color(0x0AFFFFFF), thickness = 1.dp)
+            HorizontalDivider(color = Color(0x0AFFFFFF), thickness = 1.dp)
             Spacer(modifier = Modifier.height(10.dp))
 
             // 2. The duplicates selected for safe clearance

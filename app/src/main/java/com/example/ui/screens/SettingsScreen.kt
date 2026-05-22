@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,7 +64,7 @@ fun SettingsScreen(
                         onClick = onNavigateBack,
                         modifier = Modifier.testTag("back_button")
                     ) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -141,7 +142,7 @@ fun SettingsScreen(
                         }
                     }
 
-                    Divider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                     // Critical Storage Threshold Slider
                     Column(
@@ -226,7 +227,7 @@ fun SettingsScreen(
                         testTag = "ai_photos_switch"
                     )
 
-                    Divider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                     // Scan Blurry Photos (Pro feature)
                     SettingsToggleRow(
@@ -333,7 +334,7 @@ fun SettingsScreen(
                         }
                     }
 
-                    Divider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                     // Wi-Fi Restrictions
                     SettingsToggleRow(
@@ -345,7 +346,7 @@ fun SettingsScreen(
                         testTag = "wifi_only_switch"
                     )
 
-                    Divider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                     // Charger Restrictions
                     SettingsToggleRow(
@@ -379,7 +380,7 @@ fun SettingsScreen(
                         testTag = "cache_clean_switch"
                     )
 
-                    Divider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                     // Auto Clean APKs
                     SettingsToggleRow(
@@ -391,7 +392,7 @@ fun SettingsScreen(
                         testTag = "apk_clean_switch"
                     )
 
-                    Divider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                     // Notifications Toggle
                     SettingsToggleRow(

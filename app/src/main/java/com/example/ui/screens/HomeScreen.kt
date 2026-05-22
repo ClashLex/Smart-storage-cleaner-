@@ -208,7 +208,7 @@ fun HomeScreen(
 
                         // Modern progress bar
                         LinearProgressIndicator(
-                            progress = usedPercentage / 100f,
+                            progress = { usedPercentage / 100f },
                             color = CyberPrimary,
                             trackColor = DarkSurfaceVariant,
                             modifier = Modifier
@@ -277,7 +277,7 @@ fun HomeScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator(
-                                    progress = progress / 100f,
+                                    progress = { progress / 100f },
                                     color = CyberPrimary,
                                     strokeWidth = 3.dp,
                                     modifier = Modifier.size(24.dp)

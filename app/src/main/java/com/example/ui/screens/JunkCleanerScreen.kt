@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -113,7 +115,7 @@ fun JunkCleanerScreen(
                         onClick = onNavigateBack,
                         modifier = Modifier.testTag("back_button")
                     ) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -460,7 +462,7 @@ fun JunkListItem(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = if (item.name.endsWith(".mp4") || item.name.endsWith(".zip")) Icons.Default.InsertDriveFile
+                imageVector = if (item.name.endsWith(".mp4") || item.name.endsWith(".zip")) Icons.AutoMirrored.Filled.InsertDriveFile
                 else if (item.name.endsWith(".apk")) Icons.Default.SettingsApplications
                 else Icons.Default.FolderOpen,
                 contentDescription = null,
@@ -752,7 +754,7 @@ fun FullProgressScanningView(progress: Int) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             LinearProgressIndicator(
-                progress = progress / 100f,
+                progress = { progress / 100f },
                 color = CyberPrimary,
                 trackColor = DarkSurfaceVariant,
                 modifier = Modifier
