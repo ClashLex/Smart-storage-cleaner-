@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -54,7 +55,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
     private fun checkInitialSession() {
         viewModelScope.launch {
-            val session = authRepository.userSession.stateIn(viewModelScope).value
+            val session = authRepository.userSession.firstOrNull()
             if (session?.userId != null) {
                 _uiState.value = AuthUiState.Success(
                     User(
