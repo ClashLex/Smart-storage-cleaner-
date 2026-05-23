@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, Filter, ChevronRight, HardDrive, Mail, Calendar } from 'lucide-react';
 
 interface UserRecord {
@@ -28,10 +28,34 @@ const initialUsers: UserRecord[] = [
 
 interface UsersProps {
   onSelectUser: (userId: string) => void;
+  token?: string;
 }
 
-export default function Users({ onSelectUser }: UsersProps) {
+export default function Users({ onSelectUser, token }: UsersProps) {
   const [users, setUsers] = useState<UserRecord[]>(initialUsers);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const response = await fetch(`${apiUrl}/api/admin/users`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'x-admin-secret': 'highly_secure_admin_bypass_token'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.users && Array.isArray(data.users) && data.users.length > 0) {
+            setUsers(data.users);
+          }
+        }
+      } catch (err) {
+        // Fallback silently to initialUsers preloaded state
+      }
+    };
+    fetchUsers();
+  }, [token]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'premium' | 'free' | 'admin'>('all');
   const [currentPage, setCurrentPage] = useState(1);

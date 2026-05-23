@@ -102,7 +102,7 @@ export default function App() {
       case 'overview':
         return <Overview token={authToken} />;
       case 'users':
-        return <Users onSelectUser={(id) => setSelectedUserId(id)} />;
+        return <Users onSelectUser={(id) => setSelectedUserId(id)} token={authToken} />;
       case 'subscriptions':
         return <Subscriptions token={authToken} />;
       case 'funnel':

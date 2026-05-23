@@ -1,159 +1,157 @@
-# 🧠 Smart Storage Cleaner AI
+# 🧠 Smart Storage Cleaner AI: Comprehensive Clean-Sweep Ecosystem
 
-**Smart Storage Cleaner AI** is a premium, privacy-first, on-device storage optimization and space-management application for Android. Built entirely with **Jetpack Compose (Material 3)**, **Kotlin**, and modern architectural components, the application delivers a highly responsive experience designed around a unique **Organic Cyberpunk** visual theme.
+**Smart Storage Cleaner AI** is an enterprise-grade, privacy-first, on-device storage optimization and monetization ecosystem for Android. Built with a unified design ethos based on our premium **Organic Obsidian Cyberpunk** theme, this platform delivers complete client-to-server capability encompassing:
 
----
-
-## 🎨 Visual Identity & Design Philosophy
-
-The application rejects common flat blue templates in favor of a bespoke **Organic Obsidian Dark Theme** tailored for high-contrast visual scanning, generous negative space, and a premium edge-to-edge layout:
-
-*   **Obsidian Black Base (`#0F110E`)**: A dark background that minimizes eye strain and maximizes element separation.
-*   **Sage Leaf Green Accent (`#B2D183`)**: A radiant, eco-inspired green used for major action buttons, success states, and progress indicators.
-*   **Electric Pink Accent (`#FF60BA`) / Sprout Lime (`#D6E6B0`)**: Custom colors reserved for highlighting pro/premium indicators.
-*   **Muted Matte Surfaces (`#1E211D` to `#2A2D28`)**: Deep forest midtones that frame interactive cards, borders, and category segments.
-*   **A11y Compliance**: Every interactive element satisfies Material 3's minimum **48dp x 48dp touch targets** with standard Material ripples for responsive feedback.
+1.  **📱 Android App (Jetpack Compose)**: On-device photo similarity embeddings, blurry Laplacians, cached sweeps, and local database vaults.
+2.  **⚡ Backend Node.js Engine (Express & MongoDB)**: Real-time user handshake synchronizer, RTDN Play Store receipt managers, and cascade-purge GDPR utilities.
+3.  **📊 Administrative Dashboard (React 18 + Vite + Tailwind)**: Executive panel compiling revenue funnels, detailed user ledgers, and live premium toggling.
 
 ---
-
-## 🔋 Core Capabilities
-
-### 1. Smart Photo Similarity Indexer (On-Device AI)
-*   **High-Dimensional Embeddings**: Simulates a 1024-float vector matching pipeline (inspired by MobileNet/TFLite models) to group similar photos.
-*   **dHash Matching**: Fast decimal hash calculations that isolate exact duplicate matches, forwarded files, and burst photos.
-*   **Smart Recommendation**: Employs an intelligent comparative algorithm based on blur scores (Laplacian variance) and modified times to automatically recommend a "Keeper" image per group, safely marking others for cleaning.
-
-### 2. Multi-Category Deep Junk Space Cleaner
-*   **Targeted Collectors**: Dedicated scan categories targeting old **WhatsApp** media downloads, temporary **App Cache**, obsolete **Old APKs**, and large video files.
-*   **Real-Time Progress Feed**: Micro-animations and progress updates fueled by asynchronous Kotlin Coroutines and Flows during real-time indexing.
-
-### 3. Rule-Based Customizer & Constraints
-*   **Critical Storage Alert**: Slide-based preference adjustment to change system alert thresholds.
-*   **Execution Safeguards**: Options to restrict automatic scans to Wi-Fi connectivity or active charging cycles to conserve battery life.
-
-### 4. Subscription & Paywall Framework
-*   **Tiered Premium Licenses**: Sleek tier selection showcasing exclusive premium perks (e.g., unlimited background cleaning, experimental high-speed AI scans).
-*   **Animated Paywall**: Polished package selectors displaying lifetime, monthly, and annual subscription durations with seamless validation hooks.
-
----
-
-## 🛠️ Architectural Stack & Engineering Highlights
-
-The codebase strictly adheres to Google's Android Jetpack architecture and modern guidelines:
-
-```
-  ┌────────────────────────────────────────────────────────┐
-  │                        UI Layer                        │
-  │     (Jetpack Compose Screens, Theme, Navigation)       │
-  └───────────────────────────┬────────────────────────────┘
-                              │ Exposes State (StateFlow)
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │                     ViewModel Layer                    │
-  │     (AuthViewModel, CleanerViewModel, SettingsVM)      │
-  └───────────────────────────┬────────────────────────────┘
-                              │ Calls repository operations
-                              ▼
-  ┌────────────────────────────────────────────────────────┐
-  │                    Repository Layer                    │
-  │    (AuthRepository, PhotoRepository, UserPrefRepo)    │
-  └───────────────────────────┬────────────────────────────┘
-                              │ Stores & Fetches Data
-                              ▼
-               ┌──────────────┴──────────────┐
-               ▼                             ▼
-       ┌──────────────┐              ┌──────────────┐
-       │   Room DB    │              │  DataStore  │
-       │ (Embeddings) │              │ (Settings)   │
-       └──────────────┘              └──────────────┘
-```
-
-*   **UI Layer**: Implemented using **Jetpack Compose** with Material 3 components.
-*   **State Management**: Follows **MVVM (Model-View-ViewModel)** with unidirectionally managed state. States are exposed to UI via immutable `StateFlow` structures.
-*   **Structured Persistence**:
-    *   **Room Database**: Local SQLite client indexing photo embeddings, blur metrics, and scan results.
-    *   **Jetpack DataStore**: Secure Preferences client managing user sessions, preferences, and custom thresholds.
-*   **Type-Safe Navigation**: Declared using modern Navigation Compose with argument parsing.
-*   **Asynchronous Flow**: Uses Kotlin **Coroutines** mapped to `viewModelScope` to schedule multi-threaded database transactions and avoid UI blocks.
-
----
-
-## 📂 Project Directory Structure
 
 ```text
-app/src/main/java/com/example
-├── MainActivity.kt                  # NavHost Setup, Navigation Router Entrypoint
-├── SmartCleanerApplication.kt       # Firebase + Dependency Injection Setup
-├── data                             # Infrastructure & Storage
-│   ├── AuthRepository.kt            # Handles OAuth / Sandbox authentication state
-│   ├── NetworkClient.kt             # OkHttpClient Interceptors and Retrofit client
-│   ├── PhotoCleanerRepository.kt    # Embedding generation, dHash comparative matching
-│   ├── UserPreferencesRepository.kt # DataStore settings serializations
-│   └── database                     # Room Entities, Daos, Database
-│       ├── AppDatabase.kt           # Room Database builder & fallback migrations
-│       └── PhotoEmbedding.kt        # PhotoEmbedding schema & queries
-├── domain                           # Domain Models
-│   └── Models.kt                    # Platform-independent core models (User, JunkItem)
-└── ui                               # Beautiful Presentation Layer
-    ├── Theme.kt                     # Centralized Organic Cyberpunk Theme definitions
-    ├── Color.kt                     # Theme Palette (CyberPrimary, Obsidian Black)
-    └── screens                      # Dynamic Screen composables
-        ├── HomeScreen.kt            # Available Storage Dashboard & AI Scan Launcher
-        ├── DuplicatesScreen.kt      # AI Image group comparison/selection screen
-        ├── JunkCleanerScreen.kt     # Deep sweeping utility (Cache, APKs, WhatsApp)
-        ├── SettingsScreen.kt        # Advanced Schedule rules and alert threshold configuration
-        ├── SignInScreen.kt          # Beautiful Credential-Manager page with Developer Sandbox
-        └── PaywallScreen.kt         # Secure premium upgrade and validation interface
+    ┌────────────────────────────────────────────────────────┐
+    │              📊 React Admin Dashboard (Vite)            │
+    │     - Live User Auditing      - Subscription Ledgers    │
+    │     - Funnel Conversions      - Retention Cohorts       │
+    └───────────────┬────────────────────────┬───────────────┘
+                    │ JWT Auth               │ JWT Auth
+                    ▼                        ▼
+    ┌────────────────────────────────────────────────────────┐
+    │             ⚡ Backend REST API (Node.js/Express)      │
+    │     - Firebase Token Verifier  - Play Store Billing    │
+    │     - Cascade Account Purge    - MongoDB Database      │
+    └────────────────────────────────────────▲───────────────┘
+                                             │ HTTPS Sync
+                                             │
+    ┌────────────────────────────────────────┴───────────────┐
+    │             📱 Jetpack Compose Android Client          │
+    │     - Room DB: Photo Embeds    - DataStore: Preferences│
+    │     - TensorFlow Lite Mock     - WorkManager Scheduler │
+    └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🧪 Testing Coverage
+## 🎨 Visual Identity & Premium Aesthetics
 
-The codebase includes an enterprise-grade, local JVM testing harness:
+The system rejects traditional flat, boring layouts in favor of an **Organic Obsidian Dark Theme** tailored for elite high-contrast scanning and balanced negative space:
 
-*   **Robolectric**: Executes realistic Activity-level lifecycles, navigation actions, and Compose assertions locally on the JVM without requiring slow emulator boot-ups.
-*   **Roborazzi**: Automatically records, verifies, and highlights potential UI regressions at pixel-precision level using screen snapshots.
+| Accent Color | Hex Value | Semantic Usage |
+| :--- | :--- | :--- |
+| **Obsidian Black Base** | `#0F110E` | High-comfort, eye-safe canvas dark background |
+| **Sage Leaf Green** | `#B2D183` | Main call-to-actions, successful cleanup status gauges, micro-success badges |
+| **Sprout Lime** | `#D6E6B0` | High-mid contrast segment cards, system bounds metrics, secondary active headers |
+| **Electric Pink Neon** | `#FF60BA` | Exclusive VIP premium indicators, high-speed AI mode, pro upgrade packages |
+| **Muted Forest Matte** | `#1E211D` | Interactive card surfaces, border strokes, and segment background matrices |
 
-### Running Assertions & Snapshots
-Execute standard unit and screen composition tests:
+---
+
+## 📱 Module 1: The Native Android Application (`/app`)
+
+Built with **Jetpack Compose (Material 3)**, modern Kotlin-first guidelines, and local persistence tools.
+
+### 🔋 Elite Capabilities
+*   **Smart Similarity Vector Indexer**: Combines decimal hash indices (`dHash`) with a simulated 1024-float embedding model to group visual lookalikes.
+*   **Blur & Quality Estimator**: Automatically evaluates photo quality based on Laplacian variance matrices to recommend a clean "Keeper", safely queueing secondary blurry files.
+*   **Multi-Category Deep Sweeping**: Direct client scanners targeting bulky **WhatsApp** downloads, temporary **App Caches**, obsolete **Uninstalled APKs**, and massive videos.
+*   **Flexible Work Scheduler**: Restricts automatic background cleanups to active Wi-Fi networks and charging slots to protect battery and cell-data usage.
+*   **Type-Safe Navigation Compose**: Uses Kotlin `@Serializable` objects to prevent route string typos and parameters mismatches.
+
+### ⚙️ Quick Start (Android Local Build)
+1.  **Configure API Keys Securely**: Enter variables into the secure **Secrets panel in AI Studio** or update your `.env` file in the root:
+    ```ini
+    API_BASE_URL="https://your-express-endpoint.com"
+    ```
+2.  **Build Debug App**: Execute compilation using your local Gradle installation:
+    ```bash
+    gradle assembleDebug
+    ```
+    The compiled package will be available under:  
+    `/app/build/outputs/apk/debug/app-debug.apk`.
+
+---
+
+## ⚡ Module 2: Administrative Express Server (`/backend`)
+
+High-performance Express.js server interfacing with MongoDB database adapters and Google Play Billing APIs.
+
+### 🔋 Core Features
+*   **Single-Step Firebase Synchronization**: Validates secure Google OIDC credentials, registers user profiles within Mongo, and issues custom application JWTs.
+*   **Play Billing receipt verification**: Verifies Purchases and active Google Play Console RTDN subscriptions.
+*   **Privacy-First Purge Engine**: Deletes user accounts and cascades deleted data (cleanup logs, subscription records, search snapshots) in compliance with Google Play Store GDPR policies.
+*   **Admin Audit Control**: Rich analytical routers calculating cumulative bytes freed across the platform.
+
+### ⚙️ Quick Start (Local Backend Running)
+1.  **Configure local variables**: Set up `/backend/.env`:
+    ```ini
+    PORT=3000
+    MONGODB_URI="mongodb://localhost:27017/cleaner_ai"
+    JWT_SECRET="your_highly_secure_signing_secret"
+    ADMIN_SECRET_KEY="highly_secure_admin_bypass_token"
+    ```
+2.  **Install dependencies and run**:
+    ```bash
+    cd backend
+    npm install
+    npm start
+    ```
+
+---
+
+## 📊 Module 3: Executive React Administration Board (`/dashboard`)
+
+A fast, highly integrated React 18 dashboard styled with Tailwind CSS, TypeScript, and Lucide Icons.
+
+### 🔋 Core Features
+*   **Analytical Overview Control**: Charts cumulative clean-up volumes, active subscribers ratio, and average on-device system loads.
+*   **Dynamic User Registry Manager**: Directly queries MongoDB to search registered accounts, review storage statistics, and toggle individual entitlements.
+*   **Force-Sync Purchase Ledger**: Automatically maps purchase receipt hashes and updates accounts directly.
+*   **Premium Comp Entitlement**: Administrators can grant immediate VIP status to testing sandbox accounts directly via the interface with one click.
+
+### ⚙️ Quick Start (Dashboard Dev Mode)
+1.  **Enter Environment Parameters**: Create `/dashboard/.env`:
+    ```ini
+    VITE_API_URL="http://localhost:3000"
+    ```
+2.  **Initialize Node server**:
+    ```bash
+    cd dashboard
+    npm install
+    npm run dev
+    ```
+
+---
+
+## 🧪 Verified Assurance Platform
+
+The Android application is paired with a comprehensive JVM unit testing environment:
+
+*   **Robolectric**: Exercises Compose states, ViewModel actions, and Navigation backstack transitions locally on the JVM without requiring slow emulator loads.
+*   **Roborazzi**: Takes, stores, and compares exact pixel-precision screenshots of UI components to capture any regressions early.
+
+### Diagnostic Testing Commands
+Runs standard behaviors and ViewModel assertions:
 ```bash
 gradle :app:testDebugUnitTest
 ```
 
-Verify visual layout status against reference snapshots (Roborazzi):
+Verify current screen visuals against baseline snapshots (Roborazzi):
 ```bash
 gradle :app:verifyRoborazziDebug
 ```
 
-Record updated screenshots as standard baseline references after modification:
+Record new reference baselines after customized theme alignments:
 ```bash
 gradle :app:recordRoborazziDebug
 ```
 
 ---
 
-## 📦 Build & Deployment
+## 💡 Benign System Log Notes
 
-To verify and build a debug Gradle build APK locally:
-```bash
-gradle assembleDebug
-```
-The compiled package will be available under:
-`/app/build/outputs/apk/debug/app-debug.apk`.
-
----
-
-## 🔍 Troubleshooting & Logs
-
-### 💡 Understanding Benign "Broken Input Channel" Logs
-During development, you may occasionally encounter the following logcat entries:
+During live deployment and updates within the Streaming Android environment, you might notice the following log output in Logcat:
 ```text
 E/InputDispatcher: channel '...' ~ Channel is unrecoverably broken and will be disposed!
 ```
-**What does this mean?**
-This is a standard, benign system-level warning printed by the Android OS's Input Window Manager whenever an active application window or its hosting process is closed, swiped away, or forcefully terminated.
-
-*   This occurs **every time you rebuild or redeploy a new APK version** from Google AI Studio.
-*   The system forcefully terminates the active app process to install the new version, causing the window's input buffer (InputChannel) to close.
-*   It is **NOT** a crash or memory leak in our application. You can safely ignore this log line during redeployment cycles!
+**What does this represent?**  
+This is a standard, benign notice printed by the native Android Input Manager whenever an application is forcefully closed or replaced. Because Google AI Studio terminates the active background process to hot-swap a newly compiled APK, the system window channel disconnects. It is **NOT** an application crash or memory leak; you can safely overlook it during rapid iterative development!
