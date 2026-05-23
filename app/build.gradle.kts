@@ -108,6 +108,9 @@ dependencies {
   implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
   implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
+  // TensorFlow Lite
+  implementation("org.tensorflow:tensorflow-lite:2.5.0")
+
   // Background Work & Scheduling
   implementation("androidx.work:work-runtime-ktx:2.9.1")
 

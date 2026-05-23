@@ -573,7 +573,7 @@ fun BlurryPhotoListItem(
                         .padding(horizontal = 4.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "BLURY SCORE %.1f".format(photo.blurScore),
+                        text = "BLURRY SCORE %.1f".format(photo.blurScore),
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
                         color = ErrorRed

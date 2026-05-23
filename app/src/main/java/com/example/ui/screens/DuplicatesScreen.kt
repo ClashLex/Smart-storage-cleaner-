@@ -144,9 +144,8 @@ fun DuplicatesScreen(
                                             context,
                                             "Cleaned $count duplicates ($sizeStr saved)!",
                                             Toast.LENGTH_LONG
-                                        ).onSuccess {
-                                            onNavigateBack()
-                                        }
+                                        ).show()
+                                        onNavigateBack()
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(
