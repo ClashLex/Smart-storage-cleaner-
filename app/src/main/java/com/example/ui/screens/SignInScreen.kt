@@ -48,7 +48,7 @@ fun SignInScreen(
     var sandboxName by remember { mutableStateOf("") }
 
     // Navigation trigger on login success
-    LaunchedEffect(uiState) {
+    LaunchedEffect(uiState, userSession) {
         if (uiState is AuthUiState.Success || userSession?.userId != null) {
             onSignInSuccess()
         }

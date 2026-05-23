@@ -30,7 +30,8 @@ class SettingsViewModel(
                 notificationsEnabled = true,
                 quietHoursStart = 22,
                 quietHoursEnd = 8,
-                criticalStorageThreshold = 85
+                criticalStorageThreshold = 85,
+                scheduledCleanupEnabled = true
             )
         )
 
@@ -47,8 +48,19 @@ class SettingsViewModel(
                 notificationsEnabled = updated.notificationsEnabled,
                 quietHoursStart = updated.quietHoursStart,
                 quietHoursEnd = updated.quietHoursEnd,
-                criticalStorageThreshold = updated.criticalStorageThreshold
+                criticalStorageThreshold = updated.criticalStorageThreshold,
+                scheduledCleanupEnabled = updated.scheduledCleanupEnabled
             )
+        }
+    }
+
+    fun toggleScheduledCleanup(context: android.content.Context, enabled: Boolean) {
+        val current = settings.value
+        updateSettings(current.copy(scheduledCleanupEnabled = enabled))
+        if (enabled) {
+            com.example.work.AutoCleanWorker.schedule(context.applicationContext)
+        } else {
+            com.example.work.AutoCleanWorker.cancel(context.applicationContext)
         }
     }
 

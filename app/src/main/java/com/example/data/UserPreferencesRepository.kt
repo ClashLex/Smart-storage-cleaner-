@@ -31,6 +31,8 @@ class UserPreferencesRepository(private val context: Context) {
         val QUIET_HOURS_START = intPreferencesKey("quiet_hours_start")
         val QUIET_HOURS_END = intPreferencesKey("quiet_hours_end")
         val CRITICAL_STORAGE_THRESHOLD = intPreferencesKey("critical_storage_threshold")
+        val SNOOZE_UNTIL = longPreferencesKey("snooze_until")
+        val SCHEDULED_CLEANUP_ENABLED = booleanPreferencesKey("scheduled_cleanup_enabled")
     }
 
     data class UserSession(
@@ -53,7 +55,8 @@ class UserPreferencesRepository(private val context: Context) {
         val notificationsEnabled: Boolean,
         val quietHoursStart: Int, // 0-23
         val quietHoursEnd: Int, // 0-23
-        val criticalStorageThreshold: Int // Percentage
+        val criticalStorageThreshold: Int, // Percentage
+        val scheduledCleanupEnabled: Boolean
     )
 
     val userSession: Flow<UserSession> = context.dataStore.data
@@ -81,7 +84,8 @@ class UserPreferencesRepository(private val context: Context) {
                 notificationsEnabled = preferences[PreferencesKeys.NOTIFICATIONS_ENABLED] ?: true,
                 quietHoursStart = preferences[PreferencesKeys.QUIET_HOURS_START] ?: 22, // 10 PM
                 quietHoursEnd = preferences[PreferencesKeys.QUIET_HOURS_END] ?: 8, // 8 AM
-                criticalStorageThreshold = preferences[PreferencesKeys.CRITICAL_STORAGE_THRESHOLD] ?: 85
+                criticalStorageThreshold = preferences[PreferencesKeys.CRITICAL_STORAGE_THRESHOLD] ?: 85,
+                scheduledCleanupEnabled = preferences[PreferencesKeys.SCHEDULED_CLEANUP_ENABLED] ?: true
             )
         }
 
@@ -114,6 +118,17 @@ class UserPreferencesRepository(private val context: Context) {
         }
     }
 
+    val snoozeUntil: Flow<Long> = context.dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.SNOOZE_UNTIL] ?: 0L
+        }
+
+    suspend fun saveSnoozeUntil(timestamp: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SNOOZE_UNTIL] = timestamp
+        }
+    }
+
     suspend fun updateCleanupSettings(
         cleanupFrequency: String,
         autoCleanCache: Boolean,
@@ -125,7 +140,8 @@ class UserPreferencesRepository(private val context: Context) {
         notificationsEnabled: Boolean,
         quietHoursStart: Int,
         quietHoursEnd: Int,
-        criticalStorageThreshold: Int
+        criticalStorageThreshold: Int,
+        scheduledCleanupEnabled: Boolean
     ) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.CLEANUP_FREQUENCY] = cleanupFrequency
@@ -139,6 +155,7 @@ class UserPreferencesRepository(private val context: Context) {
             preferences[PreferencesKeys.QUIET_HOURS_START] = quietHoursStart
             preferences[PreferencesKeys.QUIET_HOURS_END] = quietHoursEnd
             preferences[PreferencesKeys.CRITICAL_STORAGE_THRESHOLD] = criticalStorageThreshold
+            preferences[PreferencesKeys.SCHEDULED_CLEANUP_ENABLED] = scheduledCleanupEnabled
         }
     }
 }

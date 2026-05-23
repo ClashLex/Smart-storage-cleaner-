@@ -260,6 +260,18 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    // Scheduled Cleanup toggle
+                    SettingsToggleRow(
+                        icon = Icons.Default.Schedule,
+                        title = "Scheduled Cleanup",
+                        subtitle = "Evict background junk periodically",
+                        checked = settings.scheduledCleanupEnabled,
+                        onCheckedChange = { settingsViewModel.toggleScheduledCleanup(context, it) },
+                        testTag = "scheduled_cleanup_switch"
+                    )
+
+                    HorizontalDivider(color = Color(0x0AFFFFFF), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+
                     // Quiet Hours Start & End
                     Row(
                         modifier = Modifier
