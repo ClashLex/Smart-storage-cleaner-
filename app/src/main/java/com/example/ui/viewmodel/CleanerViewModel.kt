@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.DuplicateGroup
 import com.example.data.PhotoCleanerRepository
 import com.example.data.ServiceLocator
+import com.example.data.StorageStats
+import com.example.data.StorageStatsRepository
 import com.example.data.database.PhotoEmbedding
 import com.example.domain.JunkItem
 import kotlinx.coroutines.flow.*
@@ -18,8 +20,12 @@ sealed interface ScanUiState {
 }
 
 class CleanerViewModel(
-    private val repository: PhotoCleanerRepository
+    private val repository: PhotoCleanerRepository,
+    private val storageStatsRepository: StorageStatsRepository
 ) : ViewModel() {
+
+    private val _storageStats = MutableStateFlow<StorageStats>(StorageStats(0L, 0L, 0L, 0f))
+    val storageStats: StateFlow<StorageStats> = _storageStats.asStateFlow()
 
     private val _scanState = MutableStateFlow<ScanUiState>(ScanUiState.Unscanned)
     val scanState: StateFlow<ScanUiState> = _scanState.asStateFlow()
@@ -68,6 +74,9 @@ class CleanerViewModel(
     val selectedUris: StateFlow<Set<String>> = _selectedUris.asStateFlow()
 
     init {
+        // Fetch storage statistics initially
+        refreshStorageStats()
+
         // Pre-populate selections automatically as soon as duplicates update
         viewModelScope.launch {
             duplicateGroups.collect { groups ->
@@ -75,6 +84,12 @@ class CleanerViewModel(
                 val autoSelects = groups.flatMap { g -> g.duplicates.map { d -> d.uri } }.toSet()
                 _selectedUris.value = autoSelects
             }
+        }
+    }
+
+    fun refreshStorageStats() {
+        viewModelScope.launch {
+            _storageStats.value = storageStatsRepository.getStorageStats()
         }
     }
 
@@ -86,6 +101,7 @@ class CleanerViewModel(
                 _scanState.value = ScanUiState.Scanning(progress)
             }
             _scanState.value = ScanUiState.Scanned
+            refreshStorageStats()
         }
     }
 
@@ -114,6 +130,7 @@ class CleanerViewModel(
         viewModelScope.launch {
             repository.deletePhotos(toDelete)
             _selectedUris.value = emptySet()
+            refreshStorageStats()
             onComplete()
         }
     }
@@ -121,6 +138,7 @@ class CleanerViewModel(
     fun deleteSinglePhoto(uri: String) {
         viewModelScope.launch {
             repository.deletePhotos(listOf(uri))
+            refreshStorageStats()
         }
     }
 
@@ -162,6 +180,7 @@ class CleanerViewModel(
         val sizeFreed = itemsToDelete.sumOf { it.size }
         _whatsappItems.value = currentList.filter { it.id !in ids }
         _totalReclaimedBytes.value += sizeFreed
+        refreshStorageStats()
     }
 
     fun deleteApkItems(ids: List<String>) {
@@ -170,6 +189,7 @@ class CleanerViewModel(
         val sizeFreed = itemsToDelete.sumOf { it.size }
         _apkItems.value = currentList.filter { it.id !in ids }
         _totalReclaimedBytes.value += sizeFreed
+        refreshStorageStats()
     }
 
     fun deleteCacheItems(ids: List<String>) {
@@ -178,6 +198,7 @@ class CleanerViewModel(
         val sizeFreed = itemsToDelete.sumOf { it.size }
         _cacheItems.value = currentList.filter { it.id !in ids }
         _totalReclaimedBytes.value += sizeFreed
+        refreshStorageStats()
     }
 
     private fun generateMockWhatsAppItems(): List<JunkItem> {
@@ -211,7 +232,10 @@ class CleanerViewModel(
         fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return CleanerViewModel(ServiceLocator.photoCleanerRepository) as T
+                return CleanerViewModel(
+                    repository = ServiceLocator.photoCleanerRepository,
+                    storageStatsRepository = ServiceLocator.storageStatsRepository
+                ) as T
             }
         }
     }

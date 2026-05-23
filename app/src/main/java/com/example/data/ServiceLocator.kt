@@ -34,6 +34,10 @@ object ServiceLocator {
         )
     }
 
+    val storageStatsRepository: StorageStatsRepository by lazy {
+        StorageStatsRepository()
+    }
+
     fun initialize(context: Context) {
         if (applicationContext == null) {
             applicationContext = context.applicationContext

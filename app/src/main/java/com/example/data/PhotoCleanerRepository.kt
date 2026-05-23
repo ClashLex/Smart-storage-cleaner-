@@ -2,6 +2,7 @@ package com.example.data
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.provider.MediaStore
 import android.util.Log
 import com.example.data.database.PhotoEmbedding
 import com.example.data.database.PhotoEmbeddingDao
@@ -48,6 +49,12 @@ class PhotoCleanerRepository(
             val embedder = ImageEmbedder(context)
             
             val total = baselinePhotos.size
+            if (total == 0) {
+                onProgress(100)
+                embedder.close()
+                photoEmbeddingDao.clearAll()
+                return@withContext
+            }
             
             for (index in baselinePhotos.indices) {
                 val base = baselinePhotos[index]
@@ -196,114 +203,79 @@ class PhotoCleanerRepository(
     }
 
     /**
-     * Baseline metadata targets for scanning. Embeddings and blur metrics are left 
-     * blank as they are calculated dynamically via the synthetic/on-disk asset pipeline.
+     * Baseline metadata targets for scanning by querying MediaStore.Images.Media directly.
+     * Integrates Scoped Storage safely, reading columns: _ID, DISPLAY_NAME, SIZE, DATE_MODIFIED,
+     * _data (DATA), and BUCKET_DISPLAY_NAME as specified.
      */
     private fun getBaselineTargetPhotos(): List<PhotoEmbedding> {
-        val now = System.currentTimeMillis()
         val list = mutableListOf<PhotoEmbedding>()
+        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DISPLAY_NAME,
+            MediaStore.Images.Media.SIZE,
+            MediaStore.Images.Media.DATE_MODIFIED,
+            MediaStore.Images.Media.DATA,
+            MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+            MediaStore.Images.Media.WIDTH,
+            MediaStore.Images.Media.HEIGHT
+        )
 
-        // 1. Group 1: Identical WhatsApp copies -> matching dhash duplicates
-        val dhash1 = 89452378901L
-        list.add(PhotoEmbedding(
-            uri = "content://media/external/images/media/101",
-            fileName = "IMG_20260520_142211.jpg",
-            fileSize = 4851200L, // 4.62 MB
-            lastModified = now - 86400000,
-            width = 4000,
-            height = 3000,
-            dhash = dhash1,
-            blurScore = 0.0,
-            embedding = ""
-        ))
-        list.add(PhotoEmbedding(
-            uri = "content://media/external/images/media/102",
-            fileName = "IMG_20260520_142211_WA.jpg",
-            fileSize = 1048576L, // 1 MB (compressed copy)
-            lastModified = now - 43200000,
-            width = 1600,
-            height = 1200,
-            dhash = dhash1,
-            blurScore = 0.0,
-            embedding = ""
-        ))
+        try {
+            context.contentResolver.query(
+                uri,
+                projection,
+                null,
+                null,
+                "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
+            )?.use { cursor ->
+                val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+                val sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
+                val dateCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
+                val dataCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                val bucketCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+                
+                val widthCol = cursor.getColumnIndex(MediaStore.Images.Media.WIDTH)
+                val heightCol = cursor.getColumnIndex(MediaStore.Images.Media.HEIGHT)
 
-        // 2. Group 2: High similarity AI clustering (TFLite continuous capture burst shots)
-        val dhash2 = 123498761234L
-        val dhash2B = 123498761235L // slight dhash drift due to camera jitter, will cluster via cosine similarity
-        list.add(PhotoEmbedding(
-            uri = "content://media/external/images/media/201",
-            fileName = "DSC_0981_BURST_01.jpg",
-            fileSize = 8388608L, // 8.00 MB
-            lastModified = now - 172800000,
-            width = 4032,
-            height = 3024,
-            dhash = dhash2,
-            blurScore = 0.0,
-            embedding = ""
-        ))
-        list.add(PhotoEmbedding(
-            uri = "content://media/external/images/media/202",
-            fileName = "DSC_0981_BURST_02.jpg",
-            fileSize = 8295500L, // 7.91 MB
-            lastModified = now - 172795000,
-            width = 4032,
-            height = 3024,
-            dhash = dhash2B,
-            blurScore = 0.0,
-            embedding = ""
-        ))
+                while (cursor.moveToNext()) {
+                    val id = cursor.getLong(idCol)
+                    val contentUri = "content://media/external/images/media/$id"
+                    val name = cursor.getString(nameCol) ?: "IMG_$id.jpg"
+                    val size = cursor.getLong(sizeCol)
+                    val date = cursor.getLong(dateCol) * 1000L // Convert seconds to milliseconds
+                    
+                    // Metadata retrieved safely for internal logs or tracking
+                    val filePath = cursor.getString(dataCol) ?: ""
+                    val albumName = cursor.getString(bucketCol) ?: "Camera"
+                    
+                    val width = if (widthCol != -1) cursor.getInt(widthCol) else 1080
+                    val height = if (heightCol != -1) cursor.getInt(heightCol) else 1920
 
-        // 3. Blurry Space Wasters (Singletons with poor Laplacian scores)
-        list.add(PhotoEmbedding(
-            uri = "content://media/external/images/media/301",
-            fileName = "IMG_OUT_OF_FOCUS_NIGHT.jpg",
-            fileSize = 12582912L, // Massive 12MB blurry photo
-            lastModified = now - 259200000,
-            width = 4160,
-            height = 3120,
-            dhash = 665544332211L,
-            blurScore = 0.0,
-            embedding = ""
-        ))
-        list.add(PhotoEmbedding(
-            uri = "content://media/external/images/media/302",
-            fileName = "IMG_BLURRY_MOTION.jpg",
-            fileSize = 5120000L, // 4.88 MB
-            lastModified = now - 345600000,
-            width = 3000,
-            height = 4000,
-            dhash = 771122334411L,
-            blurScore = 0.0,
-            embedding = ""
-        ))
+                    // Unique dhash generated based on file size and metadata hash code
+                    val dhash = size xor filePath.hashCode().toLong()
 
-        // 4. Large single unique files (to test space wasters listings)
-        list.add(PhotoEmbedding(
-            uri = "content://media/external/images/media/401",
-            fileName = "HD_SYSTEM_RENDER_BACKGROUND.png",
-            fileSize = 25165824L, // 24 MB huge rendering
-            lastModified = now - 432000000,
-            width = 8000,
-            height = 6000,
-            dhash = 998877665544L,
-            blurScore = 0.0,
-            embedding = ""
-        ))
-
-        // 5. Normal sharp photos (no duplicate, no blur - should never be touched)
-        list.add(PhotoEmbedding(
-            uri = "content://media/external/images/media/501",
-            fileName = "DSC_FAMILY_PORTRAIT.jpg",
-            fileSize = 3456000L,
-            lastModified = now - 500000000,
-            width = 4000,
-            height = 3000,
-            dhash = 111222333444L,
-            blurScore = 0.0,
-            embedding = ""
-        ))
-
+                    list.add(
+                        PhotoEmbedding(
+                            uri = contentUri,
+                            fileName = name,
+                            fileSize = size,
+                            lastModified = date,
+                            width = if (width > 0) width else 1080,
+                            height = if (height > 0) height else 1920,
+                            dhash = dhash,
+                            blurScore = 0.0,
+                            embedding = ""
+                        )
+                    )
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e(tag, "Permission denied while querying MediaStore", e)
+        } catch (e: Exception) {
+            Log.e(tag, "Failed to query MediaStore", e)
+        }
         return list
     }
 

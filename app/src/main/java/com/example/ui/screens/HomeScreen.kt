@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.example.ui.theme.*
 import com.example.ui.viewmodel.CleanerViewModel
 import com.example.ui.viewmodel.ScanUiState
@@ -38,6 +41,7 @@ fun HomeScreen(
     onNavigateToPaywall: () -> Unit,
     onLogout: () -> Unit,
     onNavigateToJunk: (String) -> Unit,
+    onNavigateToPermission: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -55,18 +59,12 @@ fun HomeScreen(
     val apkSize = apkItems.sumOf { it.size }
     val cacheSize = cacheItems.sumOf { it.size }
 
-    // Base storage calculations
-    val totalCapacity = 128L * 1024L * 1024L * 1024L // 128 GB
-    val originalUsedBytes = 115200000000L // Baseline (~107.2 GB used of 128 GB)
+    val storageStats by cleanerViewModel.storageStats.collectAsState()
 
-    // Calculate dynamic savings reclaimed
-    val initialMockTotalBytes = 72263420L // Approx 68.91 MB of original mock scan
-    val currentMockTotalBytes = allPhotos.sumOf { it.fileSize }
-    val cleanedBytesDelta = (initialMockTotalBytes - currentMockTotalBytes).coerceAtLeast(0L) + totalReclaimedBytes
-
-    val currentUsedBytes = originalUsedBytes - cleanedBytesDelta
-    val currentAvailableBytes = totalCapacity - currentUsedBytes
-    val usedPercentage = ((currentUsedBytes.toDouble() / totalCapacity.toDouble()) * 100).toInt()
+    val totalCapacity = storageStats.totalBytes
+    val currentUsedBytes = storageStats.usedBytes
+    val currentAvailableBytes = storageStats.availableBytes
+    val usedPercentage = (storageStats.usedPercentage).toInt().coerceIn(0, 100)
 
     val duplicateBytesSize = duplicateGroups.flatMap { it.duplicates }.sumOf { it.fileSize }
 
@@ -171,24 +169,17 @@ fun HomeScreen(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Row(verticalAlignment = Alignment.Bottom) {
                                     Text(
-                                        text = formatDecimal(currentAvailableBytes.toDouble() / (1024 * 1024 * 1024)),
-                                        fontSize = 40.sp,
+                                        text = formatBytes(currentAvailableBytes),
+                                        fontSize = 32.sp,
                                         fontWeight = FontWeight.Light,
                                         color = CyberPrimary
-                                    )
-                                    Text(
-                                        text = " GB",
-                                        fontSize = 22.sp,
-                                        fontWeight = FontWeight.Normal,
-                                        color = OnDarkBackground,
-                                        modifier = Modifier.padding(bottom = 6.dp)
                                     )
                                 }
                             }
 
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(
-                                    text = "USED OF 128GB",
+                                    text = "USED OF ${formatBytes(totalCapacity)}",
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = OnDarkBackground.copy(alpha = 0.4f),
@@ -461,7 +452,12 @@ fun HomeScreen(
                     if (scanState is ScanUiState.Scanned) {
                         onNavigateToDuplicates()
                     } else {
-                        cleanerViewModel.startScan()
+                        // Check if system storage permissions are granted before commencing scan
+                        if (hasPermissions(context)) {
+                            cleanerViewModel.startScan()
+                        } else {
+                            onNavigateToPermission()
+                        }
                     }
                 },
                 modifier = Modifier
@@ -576,4 +572,18 @@ fun WasterGridCell(
 private fun formatDecimal(value: Double): String {
     val df = DecimalFormat("0.0")
     return df.format(value)
+}
+
+fun hasPermissions(context: Context): Boolean {
+    val permissions = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(
+            android.Manifest.permission.READ_MEDIA_IMAGES,
+            android.Manifest.permission.READ_MEDIA_VIDEO
+        )
+    } else {
+        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
+    return permissions.all {
+        ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
 }

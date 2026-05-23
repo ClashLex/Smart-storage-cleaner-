@@ -90,6 +90,21 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onNavigateToJunk = { category ->
                                     navController.navigate(Routes.buildJunkRoute(category))
+                                },
+                                onNavigateToPermission = {
+                                    navController.navigate(Routes.PERMISSION)
+                                }
+                            )
+                        }
+
+                        composable(Routes.PERMISSION) {
+                            PermissionScreen(
+                                onPermissionsGranted = {
+                                    navController.popBackStack()
+                                    cleanerViewModel.startScan()
+                                },
+                                onNavigateBack = {
+                                    navController.popBackStack()
                                 }
                             )
                         }

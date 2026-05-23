@@ -561,16 +561,7 @@ fun PhotoRowItem(
 }
 
 fun formatFileSize(bytes: Long): String {
-    if (bytes <= 0) return "0 B"
-    val df = DecimalFormat("#,##0.00")
-    if (bytes >= 1024 * 1024 * 1024) {
-        return "${df.format(bytes.toDouble() / (1024 * 1024 * 1024))} GB"
-    } else if (bytes >= 1024 * 1024) {
-        return "${df.format(bytes.toDouble() / (1024 * 1024))} MB"
-    } else if (bytes >= 1024) {
-        return "${df.format(bytes.toDouble() / 1024)} KB"
-    }
-    return "$bytes Bytes"
+    return formatBytes(bytes)
 }
 
 fun formatBytesDifferencePercentage(keeperBytes: Long, duplicateBytes: Long): String {
