@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: smart-cleaner-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://db:27017/smart_cleaner
+      - JWT_SECRET=change_this_to_something_very_secure_in_production
+      - JWT_EXPIRES_IN=7d
+      - ADMIN_SECRET_KEY=highly_secure_admin_bypass_token
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mongo:6-jammy
+    container_name: smart-cleaner-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+volumes:
+  mongo_data:
