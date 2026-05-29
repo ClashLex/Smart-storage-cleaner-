@@ -4,7 +4,8 @@
 
 1.  **📱 Android App (Jetpack Compose)**: On-device photo similarity embeddings, blurry Laplacians, cached sweeps, and local database vaults.
 2.  **⚡ Backend Node.js Engine (Express & MongoDB)**: Real-time user handshake synchronizer, RTDN Play Store receipt managers, and cascade-purge GDPR utilities.
-3.  **📊 Administrative Dashboard (React 18 + Vite + Tailwind)**: Executive panel compiling revenue funnels, detailed user ledgers, and live premium toggling.
+3.  **📊 Administrative Dashboard (React 18 + Vite + Tailwind)**: Executive panel compiling revenue funnels, detailed user ledgers, and live premium toggling.<br><br>
+![Status](https://img.shields.io/badge/status-inactive-ff0000?style=flat-square)  
 
 ---
 
