@@ -153,7 +153,8 @@ router.get('/entitlement', authenticateJWT, async (req, res) => {
       expiryTime: { $gt: new Date() }
     }).sort({ expiryTime: -1 });
 
-    const isEntitled = !!latestActiveSub;
+    // Entitled if they have an active Play Store subscription, or if marked premiumEntitled (e.g. comp/sandbox) directly in profile
+    const isEntitled = !!latestActiveSub || req.user.premiumEntitled === true;
 
     // Synchronize DB user entitlement state just in case
     if (req.user.premiumEntitled !== isEntitled) {

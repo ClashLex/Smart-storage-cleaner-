@@ -119,6 +119,10 @@ router.get('/users/:id', authenticateJWT, isAdmin, async (req, res) => {
       expiryDate: new Date(s.expiryTime).toISOString().slice(0, 10)
     }));
 
+    const logs = await CleanupLog.find({ userId: user._id });
+    const totalBytesFreed = logs.reduce((sum, log) => sum + log.bytesFreed, 0);
+    const gbFreed = totalBytesFreed / (1024 * 1024 * 1024); // GB
+
     res.json({
       user: {
         _id: user._id,
@@ -126,6 +130,7 @@ router.get('/users/:id', authenticateJWT, isAdmin, async (req, res) => {
         displayName: user.displayName,
         premiumEntitled: user.premiumEntitled,
         role: user.role,
+        gbFreed: parseFloat(gbFreed.toFixed(2)),
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       },

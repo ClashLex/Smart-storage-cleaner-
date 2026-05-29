@@ -271,7 +271,7 @@ export default function Users({ onSelectUser, token }: UsersProps) {
               <span className="text-white font-bold">
                 {Math.min(indexOfLastUser, filteredUsers.length)}
               </span>{' '}
-              of <span className="text-white font-bold">{filteredUsers.length}</span> administrators
+              of <span className="text-white font-bold">{filteredUsers.length}</span> registered accounts
             </span>
             <div className="flex items-center gap-1">
               <button

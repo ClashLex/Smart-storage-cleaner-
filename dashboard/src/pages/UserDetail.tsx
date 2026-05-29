@@ -132,7 +132,7 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
             email: freshData.user.email,
             premiumEntitled: freshData.user.premiumEntitled,
             hasAdminPrivilege: freshData.user.role === 'admin',
-            gbFreed: 0, // Fallback sum or stats
+            gbFreed: freshData.user.gbFreed || 0,
             lastSeen: new Date(freshData.user.updatedAt).toISOString().split('T')[0],
             createdDate: new Date(freshData.user.createdAt).toISOString().split('T')[0],
             subscriptionHistory: freshData.subscriptions || []

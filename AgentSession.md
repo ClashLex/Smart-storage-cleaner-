@@ -92,6 +92,12 @@ To transform the dashboard from a static UI mockup into a fully operational appl
 5.  **`DELETE /api/admin/users/:id`**: Performs a cascade deletion of a user's subscriptions, scans, cleanup logs, and core user document.
 6.  **`GET /api/admin/subscriptions`**: Queries, aggregates, and populates the global subscription ledger.
 
+### Phase 5: Critical Bug Fixes & Live Synchronizations
+During our meticulous codebase analysis and test execution iterations, we identified and successfully resolved several critical architectural anomalies:
+1.  **Fixed Premium Entitlement Override Bug (`/backend/routes/billing.js`)**: Resolves a critical bug where checking `/api/billing/entitlement` would mistakenly revoke administrative complimentary premium grants. Users manually elevated via the React Dashboard (which sets `premiumEntitled = true` directly on the profile) are now treated as entitled without being downgraded by the absence of active Google Play subscriptions.
+2.  **Live Storage Metrics Sync (`/backend/routes/admin.js` & `UserDetail.tsx`)**: Refined user dashboard details to automatically sum and calculate detailed cleanup logs (`gbFreed`), replacing empty layout fallbacks with dynamic, real-time database synchronization on detail loads.
+3.  **UI Text Refinements (`Users.tsx`)**: Cleaned table footer pagination labels to correctly reflect "registered accounts" instead of "administrators" to ensure strict alignment with the page content.
+
 ---
 
 ## 🎯 Verification and Deployment Checklist
