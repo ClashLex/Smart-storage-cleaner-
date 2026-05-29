@@ -98,6 +98,12 @@ During our meticulous codebase analysis and test execution iterations, we identi
 2.  **Live Storage Metrics Sync (`/backend/routes/admin.js` & `UserDetail.tsx`)**: Refined user dashboard details to automatically sum and calculate detailed cleanup logs (`gbFreed`), replacing empty layout fallbacks with dynamic, real-time database synchronization on detail loads.
 3.  **UI Text Refinements (`Users.tsx`)**: Cleaned table footer pagination labels to correctly reflect "registered accounts" instead of "administrators" to ensure strict alignment with the page content.
 
+### Phase 6: API Key & Secret Token Isolation
+To prevent the risk of exposed secrets or hardcoded administration keys, we resolved credential leaks:
+1.  **Eliminated Hardcoded Frontend Secrets (`Overview.tsx`, `Users.tsx`, `UserDetail.tsx`)**: Removed the hardcoded admin passkey (`highly_secure_admin_bypass_token`) and restructured the components to dynamically read from the build-time environment variable `import.meta.env.VITE_ADMIN_SECRET_KEY` (with a safe developer default).
+2.  **Documentation Onboarding Verification (`.env.example`)**: Added the environment variables guidelines to both root and dashboard example directories, showing developers how to rotate or customize administrative bypass credentials seamlessly.
+3.  **Encapsulated Android Build Variables**: Verified that on-device API keys use our secure `secrets-gradle-plugin` pointing to the gitignored `.env` file, meaning credentials are never committed into the repository or visible in clear-text resource files.
+
 ---
 
 ## 🎯 Verification and Deployment Checklist

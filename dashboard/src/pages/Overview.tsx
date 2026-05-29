@@ -72,10 +72,11 @@ export default function Overview({ token }: OverviewProps) {
     setApiFailed(false);
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const adminSecret = import.meta.env.VITE_ADMIN_SECRET_KEY || 'highly_secure_admin_bypass_token';
       const response = await fetch(`${apiUrl}/api/admin/overview`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'x-admin-secret': 'highly_secure_admin_bypass_token'
+          'x-admin-secret': adminSecret
         }
       });
       if (!response.ok) throw new Error("API Offline or Token expired");
