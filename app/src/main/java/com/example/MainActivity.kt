@@ -86,107 +86,105 @@ class MainActivity : ComponentActivity() {
                         Routes.SIGN_IN
                     }
 
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        NavHost(
-                            navController = navController,
-                            startDestination = startDestination,
-                            modifier = Modifier.padding(innerPadding)
-                        ) {
-                            composable(Routes.SIGN_IN) {
-                                SignInScreen(
-                                    authViewModel = authViewModel,
-                                    onSignInSuccess = {
-                                        navController.navigate(Routes.HOME) {
-                                            popUpTo(Routes.SIGN_IN) { inclusive = true }
-                                        }
+                    NavHost(
+                        navController = navController,
+                        startDestination = startDestination,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        composable(Routes.SIGN_IN) {
+                            SignInScreen(
+                                authViewModel = authViewModel,
+                                onSignInSuccess = {
+                                    navController.navigate(Routes.HOME) {
+                                        popUpTo(Routes.SIGN_IN) { inclusive = true }
                                     }
-                                )
-                            }
+                                }
+                            )
+                        }
 
-                            composable(Routes.HOME) {
-                                HomeScreen(
-                                    cleanerViewModel = cleanerViewModel,
-                                    onNavigateToDuplicates = {
-                                        navController.navigate(Routes.DUPLICATES)
-                                    },
-                                    onNavigateToSettings = {
-                                        navController.navigate(Routes.SETTINGS)
-                                    },
-                                    onNavigateToPaywall = {
-                                        navController.navigate(Routes.PAYWALL)
-                                    },
-                                    onLogout = {
-                                        authViewModel.logout()
-                                        navController.navigate(Routes.SIGN_IN) {
-                                            popUpTo(Routes.HOME) { inclusive = true }
-                                        }
-                                    },
-                                    onNavigateToJunk = { category ->
-                                        navController.navigate(Routes.buildJunkRoute(category))
-                                    },
-                                    onNavigateToPermission = {
-                                        navController.navigate(Routes.PERMISSION)
+                        composable(Routes.HOME) {
+                            HomeScreen(
+                                cleanerViewModel = cleanerViewModel,
+                                onNavigateToDuplicates = {
+                                    navController.navigate(Routes.DUPLICATES)
+                                },
+                                onNavigateToSettings = {
+                                    navController.navigate(Routes.SETTINGS)
+                                },
+                                onNavigateToPaywall = {
+                                    navController.navigate(Routes.PAYWALL)
+                                },
+                                onLogout = {
+                                    authViewModel.logout()
+                                    navController.navigate(Routes.SIGN_IN) {
+                                        popUpTo(Routes.HOME) { inclusive = true }
                                     }
-                                )
-                            }
+                                },
+                                onNavigateToJunk = { category ->
+                                    navController.navigate(Routes.buildJunkRoute(category))
+                                },
+                                onNavigateToPermission = {
+                                    navController.navigate(Routes.PERMISSION)
+                                }
+                            )
+                        }
 
-                            composable(Routes.PERMISSION) {
-                                PermissionScreen(
-                                    onPermissionsGranted = {
-                                        navController.popBackStack()
-                                        cleanerViewModel.startScan()
-                                    },
-                                    onNavigateBack = {
-                                        navController.popBackStack()
-                                    }
-                                )
-                            }
+                        composable(Routes.PERMISSION) {
+                            PermissionScreen(
+                                onPermissionsGranted = {
+                                    navController.popBackStack()
+                                    cleanerViewModel.startScan()
+                                },
+                                onNavigateBack = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
 
-                            composable(Routes.DUPLICATES) {
-                                DuplicatesScreen(
-                                    cleanerViewModel = cleanerViewModel,
-                                    onNavigateBack = {
-                                        navController.popBackStack()
-                                    }
-                                )
-                            }
+                        composable(Routes.DUPLICATES) {
+                            DuplicatesScreen(
+                                cleanerViewModel = cleanerViewModel,
+                                onNavigateBack = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
 
-                            composable(Routes.SETTINGS) {
-                                SettingsScreen(
-                                    settingsViewModel = settingsViewModel,
-                                    onNavigateBack = {
-                                        navController.popBackStack()
-                                    },
-                                    onNavigateToPaywall = {
-                                        navController.navigate(Routes.PAYWALL)
-                                    }
-                                )
-                            }
+                        composable(Routes.SETTINGS) {
+                            SettingsScreen(
+                                settingsViewModel = settingsViewModel,
+                                onNavigateBack = {
+                                    navController.popBackStack()
+                                },
+                                onNavigateToPaywall = {
+                                    navController.navigate(Routes.PAYWALL)
+                                }
+                            )
+                        }
 
-                            composable(Routes.PAYWALL) {
-                                PaywallScreen(
-                                    authViewModel = authViewModel,
-                                    onDismiss = {
-                                        navController.popBackStack()
-                                    }
-                                )
-                            }
+                        composable(Routes.PAYWALL) {
+                            PaywallScreen(
+                                authViewModel = authViewModel,
+                                onDismiss = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
 
-                            composable(
-                                route = Routes.JUNK_CLEANER,
-                                arguments = listOf(androidx.navigation.navArgument("category") {
-                                    type = androidx.navigation.NavType.StringType
-                                })
-                            ) { backStackEntry ->
-                                val category = backStackEntry.arguments?.getString("category") ?: "WhatsApp"
-                                JunkCleanerScreen(
-                                    initialCategory = category,
-                                    cleanerViewModel = cleanerViewModel,
-                                    onNavigateBack = {
-                                        navController.popBackStack()
-                                    }
-                                )
-                            }
+                        composable(
+                            route = Routes.JUNK_CLEANER,
+                            arguments = listOf(androidx.navigation.navArgument("category") {
+                                type = androidx.navigation.NavType.StringType
+                            })
+                        ) { backStackEntry ->
+                            val category = backStackEntry.arguments?.getString("category") ?: "WhatsApp"
+                            JunkCleanerScreen(
+                                initialCategory = category,
+                                cleanerViewModel = cleanerViewModel,
+                                onNavigateBack = {
+                                    navController.popBackStack()
+                                }
+                            )
                         }
                     }
                 }

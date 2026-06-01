@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +49,13 @@ fun PermissionScreen(
     val context = LocalContext.current
     
     // Choose appropriate permissions based on API version
-    val permissionsList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    val permissionsList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        listOf(
+            android.Manifest.permission.READ_MEDIA_IMAGES,
+            android.Manifest.permission.READ_MEDIA_VIDEO,
+            android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+        )
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         listOf(
             android.Manifest.permission.READ_MEDIA_IMAGES,
             android.Manifest.permission.READ_MEDIA_VIDEO
@@ -59,9 +66,28 @@ fun PermissionScreen(
 
     val permissionState = rememberMultiplePermissionsState(permissions = permissionsList)
 
-    // Trigger completion callback immediately when permissions are fully granted
-    LaunchedEffect(permissionState.allPermissionsGranted) {
-        if (permissionState.allPermissionsGranted) {
+    val hasEssentialPermission = remember(permissionState.permissions) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            permissionState.permissions.any {
+                (it.permission == android.Manifest.permission.READ_MEDIA_IMAGES && it.status.isGranted) ||
+                (it.permission == android.Manifest.permission.READ_MEDIA_VIDEO && it.status.isGranted) ||
+                (it.permission == android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED && it.status.isGranted)
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionState.permissions.any {
+                (it.permission == android.Manifest.permission.READ_MEDIA_IMAGES && it.status.isGranted) ||
+                (it.permission == android.Manifest.permission.READ_MEDIA_VIDEO && it.status.isGranted)
+            }
+        } else {
+            permissionState.permissions.any {
+                it.permission == android.Manifest.permission.READ_EXTERNAL_STORAGE && it.status.isGranted
+            }
+        }
+    }
+
+    // Trigger completion callback immediately when permissions are fully or partially granted
+    LaunchedEffect(hasEssentialPermission) {
+        if (hasEssentialPermission) {
             onPermissionsGranted()
         }
     }
