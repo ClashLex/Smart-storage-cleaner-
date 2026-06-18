@@ -7,7 +7,7 @@
 3.  **📊 Administrative Dashboard (React 18 + Vite + Tailwind)**: Executive panel compiling revenue funnels, detailed user ledgers, and live premium toggling.
 
 ---
-
+inactive 
 ```text
     ┌────────────────────────────────────────────────────────┐
     │              📊 React Admin Dashboard (Vite)            │
