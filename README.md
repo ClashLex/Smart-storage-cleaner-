@@ -1,38 +1,62 @@
 # 🧠 Smart Storage Cleaner AI: Comprehensive Clean-Sweep Ecosystem
 
-**Smart Storage Cleaner AI** is an enterprise-grade, privacy-first, on-device storage optimization and monetization ecosystem for Android. Built with a unified design ethos based on our premium **Organic Obsidian Cyberpunk** theme, this platform delivers complete client-to-server capability encompassing:
-
-1.  **📱 Android App (Jetpack Compose)**: On-device photo similarity embeddings, blurry Laplacians, cached sweeps, and local database vaults.
-2.  **⚡ Backend Node.js Engine (Express & MongoDB)**: Real-time user handshake synchronizer, RTDN Play Store receipt managers, and cascade-purge GDPR utilities.
-3.  **📊 Administrative Dashboard (React 18 + Vite + Tailwind)**: Executive panel compiling revenue funnels, detailed user ledgers, and live premium toggling.
-
+**Smart Storage Cleaner AI** is an enterprise-grade, privacy-first, on-device storage optimization and monetization ecosystem for Android. Built with a unified design ethos based on our premium **Organic Obsidian Cyberpunk** theme, this platform delivers complete client-to-server capability.
 
 ![Project Status: Inactive](https://www.repostatus.org/badges/latest/inactive.svg)
 
-
-
 ---
-inactive 
+
+## 🏛 Architecture Overview
+
 ```text
     ┌────────────────────────────────────────────────────────┐
     │              📊 React Admin Dashboard (Vite)            │
-    │     - Live User Auditing      - Subscription Ledgers    │
-    │     - Funnel Conversions      - Retention Cohorts       │
+    │     - Live User Auditing      - Recharts Telemetry      │
+    │     - Firebase Admin Auth     - Executive Insights      │
     └───────────────┬────────────────────────┬───────────────┘
-                    │ JWT Auth               │ JWT Auth
+                    │ JWT Auth               │ HTTPS Sync
                     ▼                        ▼
     ┌────────────────────────────────────────────────────────┐
     │             ⚡ Backend REST API (Node.js/Express)      │
-    │     - Firebase Token Verifier  - Play Store Billing    │
-    │     - Cascade Account Purge    - MongoDB Database      │
+    │     - MongoDB (Mongoose) DB    - Gemini 3.5 AI Engine  │
+    │     - Scan Session Analyzer    - Storage Recommendations│
     └────────────────────────────────────────▲───────────────┘
-                                             │ HTTPS Sync
+                                             │ REST API
                                              │
     ┌────────────────────────────────────────┴───────────────┐
     │             📱 Jetpack Compose Android Client          │
-    │     - Room DB: Photo Embeds    - DataStore: Preferences│
-    │     - TensorFlow Lite Mock     - WorkManager Scheduler │
+    │     - Room DB: Photo Embeds    - Jetpack Navigation    │
+    │     - WorkManager Scheduler    - TFLite Model          │
     └────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+├── app/                  # Module 1: Native Android Application
+│   ├── src/main/java/com/example/
+│   │   ├── data/         # Repositories (Auth, PhotoCleaner, Settings)
+│   │   ├── database/     # Room DB (AppDatabase, PhotoEmbedding)
+│   │   ├── ui/           # Jetpack Compose Screens, Theme, Navigation
+│   │   ├── viewmodel/    # MVVM Architecture ViewModels
+│   │   ├── work/         # AutoCleanWorker for background sweeping
+│   │   └── network/      # API Clients
+│   └── src/main/assets/  # Contains mobilenet_v3.tflite model
+│
+├── backend/              # Module 2: Administrative Express Server
+│   ├── models/           # Mongoose Schemas (User, ScanSession, CleanupLog)
+│   ├── routes/           # API endpoints (auth, scan, cleanup, billing)
+│   ├── middleware/       # JWT Auth and Rate Limiter
+│   ├── tests/            # Integration and Unit Tests
+│   └── server.js         # Entry point connecting to MongoDB
+│
+└── dashboard/            # Module 3: Executive React Administration Board
+    ├── src/pages/        # React Views (Overview, Users, Subscriptions, Funnel)
+    ├── src/App.tsx       # Main routing and Sidebar layout
+    ├── src/firebase.ts   # Firebase Authentication configuration
+    └── vite.config.ts    # Vite bundler settings
 ```
 
 ---
@@ -56,11 +80,9 @@ The system rejects traditional flat, boring layouts in favor of an **Organic Obs
 Built with **Jetpack Compose (Material 3)**, modern Kotlin-first guidelines, and local persistence tools.
 
 ### 🔋 Elite Capabilities
-*   **Smart Similarity Vector Indexer**: Combines decimal hash indices (`dHash`) with a simulated 1024-float embedding model to group visual lookalikes.
-*   **Blur & Quality Estimator**: Automatically evaluates photo quality based on Laplacian variance matrices to recommend a clean "Keeper", safely queueing secondary blurry files.
-*   **Multi-Category Deep Sweeping**: Direct client scanners targeting bulky **WhatsApp** downloads, temporary **App Caches**, obsolete **Uninstalled APKs**, and massive videos.
-*   **Flexible Work Scheduler**: Restricts automatic background cleanups to active Wi-Fi networks and charging slots to protect battery and cell-data usage.
-*   **Type-Safe Navigation Compose**: Uses Kotlin `@Serializable` objects to prevent route string typos and parameters mismatches.
+*   **Smart Similarity Vector Indexer**: Combines decimal hash indices (`dHash`) with a simulated `1024-float` embedding model via TensorFlow Lite to group visual lookalikes. Data is stored securely in a local **Room Database** (`PhotoEmbedding`).
+*   **Flexible Work Scheduler**: Restricts automatic background cleanups to active Wi-Fi networks and charging slots to protect battery and cell-data usage using **WorkManager** (`AutoCleanWorker.kt`). Clears old APKs and app caches automatically.
+*   **Type-Safe Navigation Compose**: Uses decoupled navigation constants for robust transitions across `HOME`, `DUPLICATES`, `JUNK_CLEANER`, and `PAYWALL` screens.
 
 ### ⚙️ Quick Start (Android Local Build)
 1.  **Configure API Keys Securely**: Enter variables into the secure **Secrets panel in AI Studio** or update your `.env` file in the root:
@@ -81,18 +103,18 @@ Built with **Jetpack Compose (Material 3)**, modern Kotlin-first guidelines, and
 High-performance Express.js server interfacing with MongoDB database adapters and Google Play Billing APIs.
 
 ### 🔋 Core Features
-*   **Single-Step Firebase Synchronization**: Validates secure Google OIDC credentials, registers user profiles within Mongo, and issues custom application JWTs.
-*   **Play Billing receipt verification**: Verifies Purchases and active Google Play Console RTDN subscriptions.
+*   **Gemini AI Recommendations**: Integrates with the **Google Generative AI (Gemini 3.5 Flash)** to analyze storage Scan Sessions and produce tailored, actionable advice for users on what to delete first.
+*   **Single-Step Firebase Synchronization**: Validates secure Google OIDC credentials, registers user profiles within Mongo, and issues custom application JWTs (`auth.js`).
 *   **Privacy-First Purge Engine**: Deletes user accounts and cascades deleted data (cleanup logs, subscription records, search snapshots) in compliance with Google Play Store GDPR policies.
-*   **Admin Audit Control**: Rich analytical routers calculating cumulative bytes freed across the platform.
 
 ### ⚙️ Quick Start (Local Backend Running)
 1.  **Configure local variables**: Set up `/backend/.env`:
     ```ini
     PORT=3000
-    MONGODB_URI="mongodb://localhost:27017/cleaner_ai"
+    MONGODB_URI="mongodb://localhost:27017/smart_cleaner"
     JWT_SECRET="your_highly_secure_signing_secret"
     ADMIN_SECRET_KEY="highly_secure_admin_bypass_token"
+    GEMINI_API_KEY="your_gemini_api_key_here"
     ```
 2.  **Install dependencies and run**:
     ```bash
@@ -108,15 +130,15 @@ High-performance Express.js server interfacing with MongoDB database adapters an
 A fast, highly integrated React 18 dashboard styled with Tailwind CSS, TypeScript, and Lucide Icons.
 
 ### 🔋 Core Features
-*   **Analytical Overview Control**: Charts cumulative clean-up volumes, active subscribers ratio, and average on-device system loads.
+*   **Analytical Overview Control**: Leverages **Recharts** to plot Area Charts (Signups vs Cleanups), Pie Charts (Revenue Mix), and Bar Charts (Daily Sweeping Composition).
+*   **Secure Administration**: Secures the executive panel via Firebase Authentication, ensuring only verified administrators can view Live Telemetry and edit user states.
 *   **Dynamic User Registry Manager**: Directly queries MongoDB to search registered accounts, review storage statistics, and toggle individual entitlements.
-*   **Force-Sync Purchase Ledger**: Automatically maps purchase receipt hashes and updates accounts directly.
-*   **Premium Comp Entitlement**: Administrators can grant immediate VIP status to testing sandbox accounts directly via the interface with one click.
 
 ### ⚙️ Quick Start (Dashboard Dev Mode)
 1.  **Enter Environment Parameters**: Create `/dashboard/.env`:
     ```ini
     VITE_API_URL="http://localhost:3000"
+    VITE_ADMIN_SECRET_KEY="highly_secure_admin_bypass_token"
     ```
 2.  **Initialize Node server**:
     ```bash
@@ -143,11 +165,6 @@ gradle :app:testDebugUnitTest
 Verify current screen visuals against baseline snapshots (Roborazzi):
 ```bash
 gradle :app:verifyRoborazziDebug
-```
-
-Record new reference baselines after customized theme alignments:
-```bash
-gradle :app:recordRoborazziDebug
 ```
 
 ---
