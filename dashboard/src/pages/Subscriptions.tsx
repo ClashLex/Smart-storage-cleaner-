@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { RefreshCw, Search, ShieldAlert, Sparkles, Filter, CreditCard, Calendar } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { RefreshCw, Search, CreditCard, Calendar } from 'lucide-react';
 
 interface SubRecord {
   _id: string;

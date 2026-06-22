@@ -1,5 +1,4 @@
-import React from 'react';
-import { Calendar, HelpCircle, ArrowRight } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 interface CohortRow {
   cohort: string;

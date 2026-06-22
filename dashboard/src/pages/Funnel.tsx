@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, UserCheck, Search, Trash2, ShieldCheck, ArrowDown, TrendingDown } from 'lucide-react';
+import { Download, UserCheck, Search, Trash2, ShieldCheck, TrendingDown } from 'lucide-react';
 
 interface FunnelStep {
   stage: string;

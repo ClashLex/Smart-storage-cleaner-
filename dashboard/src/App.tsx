@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { subscribeToAuthChanges, logoutUser } from './firebase';
 import Login from './pages/Login';
 import Overview from './pages/Overview';
@@ -60,7 +60,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  const handleLoginSuccess = (userId: string, token: string, userDetails: any) => {
+  const handleLoginSuccess = (_userId: string, token: string, userDetails: any) => {
     setAuthToken(token);
     setCurrentUser(userDetails);
   };

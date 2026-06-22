@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   ArrowLeft, 
   Sparkles, 
-  ShieldAlert, 
   Trash2, 
-  Calendar, 
-  Clock, 
   HardDrive, 
-  Mail, 
   UserPlus, 
   Fingerprint,
-  RefreshCw,
   CheckCircle2
 } from 'lucide-react';
 
@@ -110,7 +105,7 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
   };
 
   const [user, setUser] = useState<UserDetailRecord>(getInitialUser());
-  const [synced, setSynced] = useState(false);
+  const [_synced, setSynced] = useState(false);
   const [actionInfo, setActionInfo] = useState<string | null>(null);
 
   // Sync details from Backend if available /api/admin/users/:id
@@ -152,7 +147,7 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
     setActionInfo("Granting complimentary premium membership...");
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/api/admin/users/${userId}/comp-premium`, {
+      await fetch(`${apiUrl}/api/admin/users/${userId}/comp-premium`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +169,7 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
     setActionInfo("Updating account security policy...");
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/api/admin/users/${userId}/grant-admin`, {
+      await fetch(`${apiUrl}/api/admin/users/${userId}/grant-admin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -197,7 +192,7 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
     setActionInfo("Initializing cascading DB account purge...");
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/api/admin/users/${userId}`, {
+      await fetch(`${apiUrl}/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

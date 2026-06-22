@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { loginWithGoogle, isMockMode } from '../firebase';
 import { ShieldAlert, LogIn, HardDrive, Cpu } from 'lucide-react';
 
