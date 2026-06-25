@@ -1,9 +1,11 @@
 package com.example.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.data.DuplicateGroup
+import com.example.data.JunkScanRepository
 import com.example.data.PhotoCleanerRepository
 import com.example.data.ServiceLocator
 import com.example.data.StorageStats
@@ -21,7 +23,9 @@ sealed interface ScanUiState {
 
 class CleanerViewModel(
     private val repository: PhotoCleanerRepository,
-    private val storageStatsRepository: StorageStatsRepository
+    private val storageStatsRepository: StorageStatsRepository,
+    private val junkScanRepository: JunkScanRepository,
+    private val context: Context
 ) : ViewModel() {
 
     private val _storageStats = MutableStateFlow<StorageStats>(StorageStats(0L, 0L, 0L, 0f))
@@ -39,13 +43,13 @@ class CleanerViewModel(
         )
 
     // Non-photo junk tracks (WhatsApp, Old APKs, App Cache)
-    private val _whatsappItems = MutableStateFlow<List<JunkItem>>(generateMockWhatsAppItems())
+    private val _whatsappItems = MutableStateFlow<List<JunkItem>>(emptyList())
     val whatsappItems: StateFlow<List<JunkItem>> = _whatsappItems.asStateFlow()
 
-    private val _apkItems = MutableStateFlow<List<JunkItem>>(generateMockApkItems())
+    private val _apkItems = MutableStateFlow<List<JunkItem>>(emptyList())
     val apkItems: StateFlow<List<JunkItem>> = _apkItems.asStateFlow()
 
-    private val _cacheItems = MutableStateFlow<List<JunkItem>>(generateMockCacheItems())
+    private val _cacheItems = MutableStateFlow<List<JunkItem>>(emptyList())
     val cacheItems: StateFlow<List<JunkItem>> = _cacheItems.asStateFlow()
 
     private val _totalReclaimedBytes = MutableStateFlow<Long>(0L)
@@ -76,6 +80,9 @@ class CleanerViewModel(
     init {
         // Fetch storage statistics initially
         refreshStorageStats()
+        viewModelScope.launch {
+            loadRealJunkData()
+        }
 
         // Pre-populate selections automatically as soon as duplicates update
         viewModelScope.launch {
@@ -85,6 +92,13 @@ class CleanerViewModel(
                 _selectedUris.value = autoSelects
             }
         }
+    }
+
+    suspend fun loadRealJunkData() {
+        val result = junkScanRepository.performFullScan(context)
+        _whatsappItems.value = result.whatsappItems
+        _apkItems.value = result.apkItems
+        _cacheItems.value = result.cacheItems
     }
 
     fun refreshStorageStats() {
@@ -201,40 +215,15 @@ class CleanerViewModel(
         refreshStorageStats()
     }
 
-    private fun generateMockWhatsAppItems(): List<JunkItem> {
-        return listOf(
-            JunkItem("wa_1", "VID_20260515_182041.mp4", 1280000000L, "WhatsApp Video / Shared Multiple Times", "May 15, 2026"),
-            JunkItem("wa_2", "VID_20260422_WA0012.mp4", 980000000L, "WhatsApp Video / Forwarded Category", "Apr 22, 2026"),
-            JunkItem("wa_3", "IMG_Meme_Cat_Lovers.jpg", 18800000L, "WhatsApp Image / Meme Library", "May 20, 2026"),
-            JunkItem("wa_4", "WA_Audio_Note_781.opus", 15400000L, "WhatsApp Audio / Voice Note Cache", "May 19, 2026"),
-            JunkItem("wa_5", "WhatsApp_Backup_Stale.zip", 2215822000L, "WhatsApp Document / Stale Chat Backup", "Jan 12, 2026")
-        )
-    }
-
-    private fun generateMockApkItems(): List<JunkItem> {
-        return listOf(
-            JunkItem("apk_1", "com.whatsapp.android_2.26.15.apk", 820000000L, "Stale Installer / Download Directory", "May 12, 2014"),
-            JunkItem("apk_2", "facebook_lite_new.apk", 430000000L, "Local Dev Build / Leftover package", "May 01, 2026"),
-            JunkItem("apk_3", "temp_unsigned_debug.apk", 300000000L, "Android Gradle Build / Leftover debug build", "Apr 28, 2026")
-        )
-    }
-
-    private fun generateMockCacheItems(): List<JunkItem> {
-        return listOf(
-            JunkItem("cache_1", "Google Chrome Cache", 310000000L, "Cached image previews, scripts & styles", "Just now"),
-            JunkItem("cache_2", "YouTube Offline Buffer", 250000000L, "Temporary streaming block and media segments", "Just now"),
-            JunkItem("cache_3", "Spotify Music Artwork", 180000000L, "Cached PNG image albums / cover files", "Just now"),
-            JunkItem("cache_4", "Instagram Stories Preload", 100000000L, "Pre-fetched video stories and feed images", "Just now")
-        )
-    }
-
     companion object {
         fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return CleanerViewModel(
                     repository = ServiceLocator.photoCleanerRepository,
-                    storageStatsRepository = ServiceLocator.storageStatsRepository
+                    storageStatsRepository = ServiceLocator.storageStatsRepository,
+                    junkScanRepository = ServiceLocator.junkScanRepository,
+                    context = ServiceLocator.appContext
                 ) as T
             }
         }

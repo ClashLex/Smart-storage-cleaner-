@@ -38,9 +38,16 @@ object ServiceLocator {
         StorageStatsRepository()
     }
 
+    val junkScanRepository: JunkScanRepository by lazy {
+        JunkScanRepository()
+    }
+
     val cleanupLogRepository: CleanupLogRepository by lazy {
         CleanupLogRepository(networkClient.authApi)
     }
+
+    val appContext: Context
+        get() = requireContext()
 
     fun initialize(context: Context) {
         if (applicationContext == null) {
