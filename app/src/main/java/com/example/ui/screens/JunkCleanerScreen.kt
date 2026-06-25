@@ -62,6 +62,12 @@ fun JunkCleanerScreen(
     // Blurry photos use the shared selection flow as they are PhotoEmbeddings
     val selectedBlurryUris by cleanerViewModel.selectedUris.collectAsState()
 
+    LaunchedEffect(cleanerViewModel) {
+        cleanerViewModel.deleteErrorEvents.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
     // Space statistics
     val whatsappSize = whatsappItems.sumOf { it.size }
     val apkSize = apkItems.sumOf { it.size }

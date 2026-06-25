@@ -1,6 +1,7 @@
 package com.example.ui.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -12,8 +13,12 @@ import com.example.data.StorageStats
 import com.example.data.StorageStatsRepository
 import com.example.data.database.PhotoEmbedding
 import com.example.domain.JunkItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.IOException
 
 sealed interface ScanUiState {
     object Unscanned : ScanUiState
@@ -27,6 +32,7 @@ class CleanerViewModel(
     private val junkScanRepository: JunkScanRepository,
     private val context: Context
 ) : ViewModel() {
+    private val tag = "CleanerViewModel"
 
     private val _storageStats = MutableStateFlow<StorageStats>(StorageStats(0L, 0L, 0L, 0f))
     val storageStats: StateFlow<StorageStats> = _storageStats.asStateFlow()
@@ -54,6 +60,9 @@ class CleanerViewModel(
 
     private val _totalReclaimedBytes = MutableStateFlow<Long>(0L)
     val totalReclaimedBytes: StateFlow<Long> = _totalReclaimedBytes.asStateFlow()
+
+    private val _deleteErrorEvents = MutableSharedFlow<String>()
+    val deleteErrorEvents: SharedFlow<String> = _deleteErrorEvents.asSharedFlow()
 
     // Derived StateFlow: Automatically cluster duplicates reactively whenever the DB changes
     val duplicateGroups: StateFlow<List<DuplicateGroup>> = allPhotos
@@ -189,30 +198,84 @@ class CleanerViewModel(
     }
 
     fun deleteWhatsAppItems(ids: List<String>) {
-        val currentList = _whatsappItems.value
-        val itemsToDelete = currentList.filter { it.id in ids }
-        val sizeFreed = itemsToDelete.sumOf { it.size }
-        _whatsappItems.value = currentList.filter { it.id !in ids }
-        _totalReclaimedBytes.value += sizeFreed
-        refreshStorageStats()
+        viewModelScope.launch {
+            val currentList = _whatsappItems.value
+            val itemsToDelete = currentList.filter { it.id in ids }
+            val deletedIds = deleteFiles(ids, recursive = false)
+            val sizeFreed = itemsToDelete.filter { it.id in deletedIds }.sumOf { it.size }
+            _whatsappItems.value = currentList.filter { it.id !in deletedIds }
+            _totalReclaimedBytes.value += sizeFreed
+            refreshStorageStats()
+        }
     }
 
     fun deleteApkItems(ids: List<String>) {
-        val currentList = _apkItems.value
-        val itemsToDelete = currentList.filter { it.id in ids }
-        val sizeFreed = itemsToDelete.sumOf { it.size }
-        _apkItems.value = currentList.filter { it.id !in ids }
-        _totalReclaimedBytes.value += sizeFreed
-        refreshStorageStats()
+        viewModelScope.launch {
+            val currentList = _apkItems.value
+            val itemsToDelete = currentList.filter { it.id in ids }
+            val deletedIds = deleteFiles(ids, recursive = false)
+            val sizeFreed = itemsToDelete.filter { it.id in deletedIds }.sumOf { it.size }
+            _apkItems.value = currentList.filter { it.id !in deletedIds }
+            _totalReclaimedBytes.value += sizeFreed
+            refreshStorageStats()
+        }
     }
 
     fun deleteCacheItems(ids: List<String>) {
-        val currentList = _cacheItems.value
-        val itemsToDelete = currentList.filter { it.id in ids }
-        val sizeFreed = itemsToDelete.sumOf { it.size }
-        _cacheItems.value = currentList.filter { it.id !in ids }
-        _totalReclaimedBytes.value += sizeFreed
-        refreshStorageStats()
+        viewModelScope.launch {
+            val currentList = _cacheItems.value
+            val itemsToDelete = currentList.filter { it.id in ids }
+            val deletedIds = deleteCacheFiles(ids)
+            val sizeFreed = itemsToDelete.filter { it.id in deletedIds }.sumOf { it.size }
+            _cacheItems.value = currentList.filter { it.id !in deletedIds }
+            _totalReclaimedBytes.value += sizeFreed
+            refreshStorageStats()
+        }
+    }
+
+    private suspend fun deleteFiles(ids: List<String>, recursive: Boolean): Set<String> {
+        val results = withContext(Dispatchers.IO) {
+            ids.map { id ->
+                id to deleteFile(id, File(id), recursive)
+            }
+        }
+        emitDeleteFailures(results)
+        return results.filter { it.second }.map { it.first }.toSet()
+    }
+
+    private suspend fun deleteCacheFiles(ids: List<String>): Set<String> {
+        val results = withContext(Dispatchers.IO) {
+            ids.map { id ->
+                val target = if (id == "internal_cache") context.cacheDir else File(id)
+                id to deleteFile(id, target, recursive = true)
+            }
+        }
+        emitDeleteFailures(results)
+        return results.filter { it.second }.map { it.first }.toSet()
+    }
+
+    private fun deleteFile(id: String, file: File, recursive: Boolean): Boolean {
+        return try {
+            val deleted = if (recursive) file.deleteRecursively() else file.delete()
+            if (deleted) {
+                Log.d(tag, "Deleted junk item: $id")
+            } else {
+                Log.e(tag, "Failed to delete junk item: $id")
+            }
+            deleted
+        } catch (e: IOException) {
+            Log.e(tag, "IOException while deleting junk item: $id", e)
+            false
+        } catch (e: SecurityException) {
+            Log.e(tag, "Permission denied while deleting junk item: $id", e)
+            false
+        }
+    }
+
+    private suspend fun emitDeleteFailures(results: List<Pair<String, Boolean>>) {
+        results.filterNot { it.second }.forEach { (id, _) ->
+            _deleteErrorEvents.emit("Failed to delete ${File(id).name.ifBlank { id }}")
+        }
     }
 
     companion object {
