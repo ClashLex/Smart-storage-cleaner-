@@ -70,18 +70,18 @@ fun PaywallScreen(
                                 }
                             }
                         ) {
-                            Text("Reset Free Tier", color = ErrorRed, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Text("Reset Free Tier", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground,
-                    titleContentColor = OnDarkBackground,
-                    navigationIconContentColor = OnDarkBackground
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = modifier
     ) { innerPadding ->
         Column(
@@ -100,7 +100,7 @@ fun PaywallScreen(
                     .height(140.dp)
                     .background(
                         brush = Brush.radialGradient(
-                            colors = listOf(CyberPrimary.copy(alpha = 0.25f), Color.Transparent)
+                            colors = listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f), Color.Transparent)
                         ),
                         shape = RoundedCornerShape(24.dp)
                     ),
@@ -110,7 +110,7 @@ fun PaywallScreen(
                     Icon(
                         imageVector = Icons.Default.WorkspacePremium,
                         contentDescription = null,
-                        tint = ElectricPink,
+                        tint = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.size(60.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -119,7 +119,7 @@ fun PaywallScreen(
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.5.sp,
-                        color = CyberPrimary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -136,9 +136,9 @@ fun PaywallScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             shape = RoundedCornerShape(32.dp),
-                            border = BorderStroke(1.dp, CyberPrimary.copy(alpha = 0.3f)),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(
@@ -148,13 +148,13 @@ fun PaywallScreen(
                                 Box(
                                     modifier = Modifier
                                         .size(48.dp)
-                                        .background(CyberPrimary.copy(alpha = 0.2f), CircleShape),
+                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Check,
                                         contentDescription = "Success",
-                                        tint = CyberPrimary,
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
@@ -165,14 +165,14 @@ fun PaywallScreen(
                                     text = "Premium Active",
                                     fontWeight = FontWeight.ExtraBold,
                                     fontSize = 24.sp,
-                                    color = OnDarkBackground,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     textAlign = TextAlign.Center
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "All pro filters, automated scans, and Laplacian clustering layers are fully unlocked.",
                                     fontSize = 13.sp,
-                                    color = TextSecondary,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
                                     lineHeight = 18.sp
                                 )
@@ -182,8 +182,8 @@ fun PaywallScreen(
                         Button(
                             onClick = onDismiss,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = CyberPrimary,
-                                contentColor = OnCyberPrimary
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             shape = RoundedCornerShape(24.dp),
                             modifier = Modifier
@@ -259,9 +259,9 @@ fun PaywallScreen(
                                     horizontalArrangement = Arrangement.Center,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    CircularProgressIndicator(color = CyberPrimary)
+                                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                                     Spacer(modifier = Modifier.width(12.dp))
-                                    Text("Authorizing sandbox token...", color = OnDarkBackground, fontSize = 14.sp)
+                                    Text("Authorizing sandbox token...", color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp)
                                 }
                             } else {
                                 Button(
@@ -285,8 +285,8 @@ fun PaywallScreen(
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = CyberPrimary,
-                                        contentColor = OnCyberPrimary
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
                                     ),
                                     shape = RoundedCornerShape(24.dp),
                                     modifier = Modifier
@@ -305,7 +305,7 @@ fun PaywallScreen(
                         Text(
                             text = "Play Billing v6 Sandbox Mode Enabled",
                             fontSize = 11.sp,
-                            color = TextSecondary.copy(alpha = 0.5f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                         )
                     }
                 }
@@ -326,14 +326,14 @@ fun PaywallFeatureRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = CyberPrimary,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(10.dp))
         Text(
             text = text,
             fontSize = 13.sp,
-            color = OnDarkBackground
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }
@@ -349,12 +349,12 @@ fun PaywallTierCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = if (selected) DarkSurfaceVariant else DarkSurface
+            containerColor = if (selected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
         ),
         shape = RoundedCornerShape(20.dp),
         border = BorderStroke(
             width = if (selected) 2.dp else 1.dp,
-            color = if (selected) CyberPrimary else Color(0x11FFFFFF)
+            color = if (selected) MaterialTheme.colorScheme.primary else Color(0x11FFFFFF)
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -367,7 +367,7 @@ fun PaywallTierCard(
                     modifier = Modifier
                         .background(
                             brush = Brush.horizontalGradient(
-                                listOf(CyberPrimary, ElectricPink)
+                                listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary)
                             ),
                             shape = RoundedCornerShape(6.dp)
                         )
@@ -377,7 +377,7 @@ fun PaywallTierCard(
                         text = badgeText,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = OnCyberPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         letterSpacing = 0.5.sp
                     )
                 }
@@ -394,8 +394,8 @@ fun PaywallTierCard(
                         selected = selected,
                         onClick = onSelect,
                         colors = RadioButtonDefaults.colors(
-                            selectedColor = CyberPrimary,
-                            unselectedColor = TextSecondary
+                            selectedColor = MaterialTheme.colorScheme.primary,
+                            unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -403,7 +403,7 @@ fun PaywallTierCard(
                         text = title,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        color = OnDarkBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
 
@@ -411,7 +411,7 @@ fun PaywallTierCard(
                     text = price,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = if (selected) CyberPrimary else OnDarkBackground
+                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                 )
             }
         }

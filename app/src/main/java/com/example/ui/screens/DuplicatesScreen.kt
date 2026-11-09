@@ -62,7 +62,7 @@ fun DuplicatesScreen(
                         Text(
                             text = "TFLite Spatial Clustering",
                             style = MaterialTheme.typography.bodySmall,
-                            color = CyberPrimary,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Normal
                         )
                     }
@@ -88,24 +88,24 @@ fun DuplicatesScreen(
                         ) {
                             Text(
                                 text = if (selectedUris.size == duplicateGroups.flatMap { it.duplicates }.size) "Deselect All" else "Select All",
-                                color = CyberPrimary,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground,
-                    titleContentColor = OnDarkBackground,
-                    navigationIconContentColor = OnDarkBackground
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             if (duplicateGroups.isNotEmpty() && selectedUris.isNotEmpty()) {
                 Surface(
-                    color = DarkSurface,
+                    color = MaterialTheme.colorScheme.surface,
                     tonalElevation = 8.dp,
                     border = BorderStroke(1.dp, Color(0x1AFFFFFF)),
                     modifier = Modifier.fillMaxWidth()
@@ -123,13 +123,13 @@ fun DuplicatesScreen(
                             Column {
                                 Text(
                                     text = "${selectedUris.size} files selected",
-                                    color = OnDarkBackground,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
                                     text = "Reclaiming ${formatFileSize(selectedSavings)}",
-                                    color = ElectricPink,
+                                    color = MaterialTheme.colorScheme.tertiary,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -149,8 +149,8 @@ fun DuplicatesScreen(
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = CyberPrimary,
-                                    contentColor = OnCyberPrimary
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
                                 ),
                                 shape = RoundedCornerShape(24.dp),
                                 modifier = Modifier
@@ -184,7 +184,7 @@ fun DuplicatesScreen(
                         Icon(
                             imageVector = Icons.Default.ImageNotSupported,
                             contentDescription = null,
-                            tint = TextSecondary,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -192,21 +192,21 @@ fun DuplicatesScreen(
                             text = "Unscanned Local Storage",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = OnDarkBackground
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Run a smart optimizer scan from the home library to find clusters of identical photo entries safely.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         Button(
                             onClick = { cleanerViewModel.startScan() },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = CyberPrimary,
-                                contentColor = OnCyberPrimary
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             shape = RoundedCornerShape(16.dp)
                         ) {
@@ -228,7 +228,7 @@ fun DuplicatesScreen(
                         modifier = Modifier.padding(32.dp)
                     ) {
                         CircularProgressIndicator(
-                            color = CyberPrimary,
+                            color = MaterialTheme.colorScheme.primary,
                             strokeWidth = 6.dp,
                             modifier = Modifier.size(80.dp)
                         )
@@ -237,20 +237,20 @@ fun DuplicatesScreen(
                             text = "Analyzing Spatial Signatures...",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = OnDarkBackground
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Extracting perceptual dHash profiles and continuous embedding weights on-device ($progress%)",
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         LinearProgressIndicator(
                             progress = { progress / 100f },
-                            color = CyberPrimary,
-                            trackColor = DarkSurfaceVariant,
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(6.dp)
@@ -274,7 +274,7 @@ fun DuplicatesScreen(
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
-                                tint = KeeperGreen,
+                                tint = MaterialTheme.colorScheme.tertiary,
                                 modifier = Modifier.size(72.dp)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
@@ -282,18 +282,18 @@ fun DuplicatesScreen(
                                 text = "Zero Duplicates Found!",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = OnDarkBackground
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Your media library is pristine. All duplicates and blurry variants are fully optimized.",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(24.dp))
                             TextButton(onClick = onNavigateBack) {
-                                Text("Go Back to Dashboard", color = CyberPrimary, fontWeight = FontWeight.Bold)
+                                Text("Go Back to Dashboard", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -307,7 +307,7 @@ fun DuplicatesScreen(
                     ) {
                         item {
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = DarkSurfaceVariant),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                                 shape = RoundedCornerShape(24.dp),
                                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                             ) {
@@ -318,7 +318,7 @@ fun DuplicatesScreen(
                                     Icon(
                                         imageVector = Icons.Default.Info,
                                         contentDescription = null,
-                                        tint = CyberPrimary,
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Spacer(modifier = Modifier.width(12.dp))
@@ -327,12 +327,12 @@ fun DuplicatesScreen(
                                             text = "${duplicateGroups.size} Duplicate Clusters Detected",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 15.sp,
-                                            color = OnDarkBackground
+                                            color = MaterialTheme.colorScheme.onBackground
                                         )
                                         Text(
                                             text = "Safely clearing unrecommended copies can salvage up to ${formatFileSize(totalPotentialSavings)} on disk.",
                                             fontSize = 12.sp,
-                                            color = TextSecondary
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }
@@ -360,7 +360,7 @@ fun DuplicateGroupCard(
     onToggle: (String) -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(28.dp),
         border = BorderStroke(1.dp, Color(0x0FFFFFFF)),
         modifier = Modifier.fillMaxWidth()
@@ -382,7 +382,7 @@ fun DuplicateGroupCard(
                         Icon(
                             imageVector = Icons.Default.FilterNone,
                             contentDescription = null,
-                            tint = CyberPrimary,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -390,14 +390,14 @@ fun DuplicateGroupCard(
                     Text(
                         text = "Match Group (${1 + group.duplicates.size})",
                         fontWeight = FontWeight.Bold,
-                        color = OnDarkBackground,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 14.sp
                     )
                 }
                 Text(
                     text = "Savings: ${formatFileSize(group.potentialSavings)}",
                     fontWeight = FontWeight.Bold,
-                    color = ElectricPink,
+                    color = MaterialTheme.colorScheme.tertiary,
                     fontSize = 12.sp
                 )
             }
@@ -454,14 +454,14 @@ fun PhotoRowItem(
         Box(
             modifier = Modifier
                 .size(60.dp)
-                .background(DarkSurfaceVariant, RoundedCornerShape(12.dp))
-                .border(1.dp, if (isKeeper) CyberPrimary else Color.Transparent, RoundedCornerShape(12.dp)),
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+                .border(1.dp, if (isKeeper) MaterialTheme.colorScheme.primary else Color.Transparent, RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = if (isKeeper) Icons.Default.CheckCircle else Icons.Default.Filter,
                 contentDescription = null,
-                tint = if (isKeeper) CyberPrimary else TextSecondary,
+                tint = if (isKeeper) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
             // Dimensions indicator bubble
@@ -491,7 +491,7 @@ fun PhotoRowItem(
                 Text(
                     text = photo.fileName,
                     fontWeight = FontWeight.Bold,
-                    color = OnDarkBackground,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 13.sp,
                     maxLines = 1
                 )
@@ -499,14 +499,14 @@ fun PhotoRowItem(
                     Spacer(modifier = Modifier.width(6.dp))
                     Box(
                         modifier = Modifier
-                            .background(CyberPrimary, RoundedCornerShape(4.dp))
+                            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
                             .padding(horizontal = 5.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = "BEST",
                             fontSize = 8.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = OnCyberPrimary
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -514,7 +514,7 @@ fun PhotoRowItem(
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = "$subtitle • ${formatFileSize(photo.fileSize)}",
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 11.sp
             )
             Row(
@@ -524,13 +524,13 @@ fun PhotoRowItem(
                 Icon(
                     imageVector = Icons.Default.BlurOn,
                     contentDescription = null,
-                    tint = TextSecondary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(10.dp)
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = "L-Blur score: ${"%.1f".format(photo.blurScore)}",
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 10.sp
                 )
             }
@@ -541,9 +541,9 @@ fun PhotoRowItem(
                 checked = isSelected,
                 onCheckedChange = { onToggle() },
                 colors = CheckboxDefaults.colors(
-                    checkedColor = CyberPrimary,
-                    uncheckedColor = TextSecondary,
-                    checkmarkColor = OnCyberPrimary
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    checkmarkColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 modifier = Modifier.testTag("duplicate_select_${photo.uri}")
             )
@@ -552,7 +552,7 @@ fun PhotoRowItem(
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = "Keeper lock",
-                    tint = KeeperGreen,
+                    tint = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.size(18.dp)
                 )
             }

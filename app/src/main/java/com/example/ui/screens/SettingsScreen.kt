@@ -54,7 +54,7 @@ fun SettingsScreen(
                         Text(
                             text = "Configure engine thresholds & limits",
                             style = MaterialTheme.typography.bodySmall,
-                            color = CyberPrimary,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Normal
                         )
                     }
@@ -68,13 +68,13 @@ fun SettingsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground,
-                    titleContentColor = OnDarkBackground,
-                    navigationIconContentColor = OnDarkBackground
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = modifier
     ) { innerPadding ->
         Column(
@@ -89,7 +89,7 @@ fun SettingsScreen(
             SettingsSectionHeader(title = "CLEANUP FREQUENCY & THRESHOLDS")
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(24.dp),
                 border = BorderStroke(1.dp, Color(0x0FFFFFFF)),
                 modifier = Modifier.fillMaxWidth()
@@ -108,7 +108,7 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.Timer,
                                 contentDescription = null,
-                                tint = CyberPrimary,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
@@ -117,26 +117,26 @@ fun SettingsScreen(
                                     text = "Auto Scan Frequency",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp,
-                                    color = OnDarkBackground
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Text(
                                     text = "Automated spatial duplicate background search",
                                     fontSize = 11.sp,
-                                    color = TextSecondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = settings.cleanupFrequency,
-                                color = CyberPrimary,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
                             )
                             Icon(
                                 imageVector = Icons.Default.ChevronRight,
                                 contentDescription = null,
-                                tint = TextSecondary,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -159,7 +159,7 @@ fun SettingsScreen(
                                 Icon(
                                     imageVector = Icons.Default.Storage,
                                     contentDescription = null,
-                                    tint = CyberPrimary,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
@@ -168,18 +168,18 @@ fun SettingsScreen(
                                         text = "Critical Storage Warning",
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 14.sp,
-                                        color = OnDarkBackground
+                                        color = MaterialTheme.colorScheme.onBackground
                                     )
                                     Text(
                                         text = "Alert when partition fullness exceeds threshold",
                                         fontSize = 11.sp,
-                                        color = TextSecondary
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
                             Text(
                                 text = "${settings.criticalStorageThreshold}%",
-                                color = CyberPrimary,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
                             )
@@ -193,11 +193,11 @@ fun SettingsScreen(
                             valueRange = 50f..95f,
                             steps = 9,
                             colors = SliderDefaults.colors(
-                                activeTrackColor = CyberPrimary,
-                                inactiveTrackColor = DarkSurfaceVariant,
-                                thumbColor = CyberPrimary,
-                                activeTickColor = DarkBackground,
-                                inactiveTickColor = CyberPrimary
+                                activeTrackColor = MaterialTheme.colorScheme.primary,
+                                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                thumbColor = MaterialTheme.colorScheme.primary,
+                                activeTickColor = MaterialTheme.colorScheme.background,
+                                inactiveTickColor = MaterialTheme.colorScheme.primary
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -211,7 +211,7 @@ fun SettingsScreen(
             SettingsSectionHeader(title = "AI SCAN COGNITIVE FILTERS")
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(24.dp),
                 border = BorderStroke(1.dp, Color(0x0FFFFFFF)),
                 modifier = Modifier.fillMaxWidth()
@@ -254,7 +254,7 @@ fun SettingsScreen(
             SettingsSectionHeader(title = "BACKGROUND SCHEDULER RULES")
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(24.dp),
                 border = BorderStroke(1.dp, Color(0x0FFFFFFF)),
                 modifier = Modifier.fillMaxWidth()
@@ -284,7 +284,7 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.Bedtime,
                                 contentDescription = null,
-                                tint = CyberPrimary,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
@@ -293,12 +293,12 @@ fun SettingsScreen(
                                     text = "Quiet Scan Lock",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp,
-                                    color = OnDarkBackground
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Text(
                                     text = "Pause background scans during rest cycle",
                                     fontSize = 11.sp,
-                                    color = TextSecondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -311,7 +311,7 @@ fun SettingsScreen(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(DarkSurfaceVariant)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .clickable {
                                         val newStart = (settings.quietHoursStart + 1) % 24
                                         settingsViewModel.setQuietHours(newStart, settings.quietHoursEnd)
@@ -322,14 +322,14 @@ fun SettingsScreen(
                                     text = "%02d:00".format(settings.quietHoursStart),
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = CyberPrimary
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             }
-                            Text(text = "to", color = TextSecondary, fontSize = 12.sp)
+                            Text(text = "to", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(DarkSurfaceVariant)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .clickable {
                                         val newEnd = (settings.quietHoursEnd + 1) % 24
                                         settingsViewModel.setQuietHours(settings.quietHoursStart, newEnd)
@@ -340,7 +340,7 @@ fun SettingsScreen(
                                     text = "%02d:00".format(settings.quietHoursEnd),
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = CyberPrimary
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }
@@ -376,7 +376,7 @@ fun SettingsScreen(
             SettingsSectionHeader(title = "HARDWARE SAFEGUARDS")
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(24.dp),
                 border = BorderStroke(1.dp, Color(0x0FFFFFFF)),
                 modifier = Modifier.fillMaxWidth()
@@ -428,14 +428,14 @@ fun SettingsScreen(
                 Icon(
                     imageVector = Icons.Default.Security,
                     contentDescription = null,
-                    tint = CyberPrimary.copy(alpha = 0.4f),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "On-Device Neural Sanitizer\nVersion 3.4.1 (Stable Release)",
                     fontSize = 11.sp,
-                    color = TextSecondary.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     textAlign = TextAlign.Center,
                     lineHeight = 16.sp
                 )
@@ -453,11 +453,11 @@ fun SettingsScreen(
                     text = "Select Auto Scan Frequency",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = OnDarkBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             },
-            containerColor = DarkSurface,
-            textContentColor = OnDarkSurface,
+            containerColor = MaterialTheme.colorScheme.surface,
+            textContentColor = MaterialTheme.colorScheme.onSurface,
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     options.forEach { option ->
@@ -476,14 +476,14 @@ fun SettingsScreen(
                             Text(
                                 text = option,
                                 fontWeight = FontWeight.Medium,
-                                color = if (settings.cleanupFrequency == option) CyberPrimary else OnDarkBackground,
+                                color = if (settings.cleanupFrequency == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                                 fontSize = 14.sp
                             )
                             if (settings.cleanupFrequency == option) {
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = "Selected",
-                                    tint = CyberPrimary,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -493,7 +493,7 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showFrequencyDialog = false }) {
-                    Text("Close", color = CyberPrimary, fontWeight = FontWeight.Bold)
+                    Text("Close", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 }
             }
         )
@@ -507,7 +507,7 @@ fun SettingsSectionHeader(title: String) {
         fontSize = 11.sp,
         fontWeight = FontWeight.ExtraBold,
         letterSpacing = 1.5.sp,
-        color = OnDarkBackground.copy(alpha = 0.4f),
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
         modifier = Modifier.padding(start = 8.dp, bottom = 2.dp)
     )
 }
@@ -536,7 +536,7 @@ fun SettingsToggleRow(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isProGated) ElectricPink else CyberPrimary,
+                tint = if (isProGated) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(12.dp))
@@ -546,20 +546,20 @@ fun SettingsToggleRow(
                         text = title,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        color = OnDarkBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     if (isProGated) {
                         Spacer(modifier = Modifier.width(6.dp))
                         Box(
                             modifier = Modifier
-                                .background(ElectricPink, RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(4.dp))
                                 .padding(horizontal = 4.dp, vertical = 2.dp)
                         ) {
                             Text(
                                 text = "PRO",
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = OnElectricPink
+                                color = MaterialTheme.colorScheme.onTertiary
                             )
                         }
                     }
@@ -567,7 +567,7 @@ fun SettingsToggleRow(
                 Text(
                     text = subtitle,
                     fontSize = 11.sp,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -576,10 +576,10 @@ fun SettingsToggleRow(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = OnCyberPrimary,
-                checkedTrackColor = CyberPrimary,
-                uncheckedThumbColor = TextSecondary,
-                uncheckedTrackColor = DarkSurfaceVariant
+                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
             ),
             modifier = Modifier.testTag(testTag)
         )
