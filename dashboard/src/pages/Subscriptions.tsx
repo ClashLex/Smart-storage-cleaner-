@@ -7,7 +7,7 @@ interface SubRecord {
   email?: string;
   productId: string;
   orderId: string;
-  status: 'active' | 'cancelled' | 'expired';
+  status: 'active' | 'pending' | 'cancelled' | 'expired' | 'refunded';
   expiryTime: string;
   createdAt: string;
 }

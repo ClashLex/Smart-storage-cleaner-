@@ -1,6 +1,9 @@
 package com.example.network
 
 import com.example.domain.*
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -70,7 +73,7 @@ data class BackendEntitlementResponse(
         activeProduct = subscription?.productId,
         isPremium = premiumEntitled,
         expiryTime = subscription?.expiryTime?.let {
-            runCatching { java.time.Instant.parse(it).toEpochMilli() }.getOrDefault(0L)
+            parseBackendDate(it)
         } ?: 0L
     )
 }
@@ -96,3 +99,18 @@ data class BackendSubscriptionDto(
 )
 
 data class BackendEntitlementDto(val premiumEntitled: Boolean)
+
+private fun parseBackendDate(value: String): Long {
+    val formats = listOf(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+        "yyyy-MM-dd'T'HH:mm:ss'Z'"
+    )
+    return formats.firstNotNullOfOrNull { pattern ->
+        runCatching {
+            SimpleDateFormat(pattern, Locale.US).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+                isLenient = false
+            }.parse(value)?.time
+        }.getOrNull()
+    } ?: 0L
+}

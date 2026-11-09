@@ -238,7 +238,7 @@ fun SignInScreen(
                             color = DarkSurfaceVariant.copy(alpha = 0.5f)
                         )
                         Text(
-                            text = "DEVELOPER SANDBOX BYPASS",
+                            text = "SANDBOX SIGN-IN DISABLED",
                             style = MaterialTheme.typography.labelSmall,
                             color = TextSecondary.copy(alpha = 0.7f),
                             modifier = Modifier.padding(horizontal = 16.dp),
@@ -252,7 +252,8 @@ fun SignInScreen(
 
                     // Direct Demo Developer Bypass Button
                     OutlinedButton(
-                        onClick = { showSandboxDialog = true },
+                        onClick = { showSandboxDialog = false },
+                        enabled = false,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
