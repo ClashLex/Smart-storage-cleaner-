@@ -44,5 +44,7 @@ Branch: audit/fix-2026-11-09
 ## Validation status
 - Repository tree and source files inspected through GitHub.
 - Changes are being staged as Git objects on the audit branch.
-- Local builds and integration tests were not executable in this session.
-- Do not merge until CI, Android build, backend tests, Firebase login, Play purchase verification, and Pub/Sub webhook tests pass.
+- GitHub Actions CI passed on the audit branch: backend Jest 4 suites / 14 tests passed; dashboard dependency installation and TypeScript/Vite production build passed.
+- Backend npm install reported 16 dependency advisories (6 low, 10 moderate); run npm audit and review remediation before production release.
+- Android Gradle build and device tests were not included in CI. Firebase login, Play purchase verification, and Pub/Sub OIDC still require configured credentials and integration tests.
+- Do not merge until Android build/device validation and the remaining production integrations have been verified.
