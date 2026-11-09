@@ -92,7 +92,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
                 val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
                 val user = FirebaseAuth.getInstance().signInWithCredential(firebaseCredential).awaitResult().user
                     ?: throw IllegalStateException("Firebase sign-in did not return a user.")
-                val freshToken = user.getIdToken(true).await().token
+                val freshToken = user.getIdToken(true).awaitResult().token
                     ?: throw IllegalStateException("Unable to obtain a Firebase ID token.")
                 authRepository.syncWithBackend(freshToken)
                     .onSuccess { _uiState.value = AuthUiState.Success(it) }
