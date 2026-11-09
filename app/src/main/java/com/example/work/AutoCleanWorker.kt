@@ -67,30 +67,8 @@ class AutoCleanWorker(
             }
         }
 
-        // 2. Deletes APK files from Downloads older than 30 days
-        if (settings == null || settings.autoCleanApks) {
-            try {
-                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                if (downloadsDir.exists() && downloadsDir.isDirectory) {
-                    val thirtyDaysAgo = System.currentTimeMillis() - 30L * 24L * 60L * 60L * 1000L
-                    val oldApks = downloadsDir.listFiles()?.filter { file ->
-                        file.isFile && file.name.endsWith(".apk", ignoreCase = true) && file.lastModified() < thirtyDaysAgo
-                    }
-                    var apkFreed = 0L
-                    oldApks?.forEach { file ->
-                        val length = file.length()
-                        if (file.delete()) {
-                            apkFreed += length
-                        }
-                    }
-                    totalBytesFreed += apkFreed
-                    cleanupLogRepository.logCleanup("APKs", apkFreed)
-                    Log.d("AutoCleanWorker", "Stale APKs deleted. Bytes reclaimed: $apkFreed")
-                }
-            } catch (e: Exception) {
-                Log.e("AutoCleanWorker", "Failed to clean up stale APKs in downloads", e)
-            }
-        }
+        // APK installers are user-owned files. Never remove them automatically.
+        // Present stale APK candidates in the foreground review flow instead.
 
         // Check critical storage for alerts
         try {

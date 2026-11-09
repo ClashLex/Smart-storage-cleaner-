@@ -4,110 +4,95 @@ const ScanSession = require('../models/ScanSession');
 const { authenticateJWT } = require('../middleware/auth');
 
 const router = express.Router();
+const MAX_CATEGORIES = 50;
+const MAX_CATEGORY_NAME = 64;
 
-// Helper to format bytes to human readable form
 function formatBytes(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 Bytes';
+  const units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  return `${Number((bytes / (1024 ** index)).toFixed(2))} ${units[index]}`;
 }
 
-/**
- * POST /api/scan
- * Receives category sizes, saves the scan session, and queries the Gemini Model for tailored storage cleanup advice.
- */
 router.post('/', authenticateJWT, async (req, res) => {
-  const { categories } = req.body;
+  const { categories } = req.body || {};
+  if (!Array.isArray(categories) || categories.length > MAX_CATEGORIES) {
+    return res.status(400).json({ error: `categories must be an array with at most ${MAX_CATEGORIES} entries.` });
+  }
 
-  if (!categories || !Array.isArray(categories)) {
-    return res.status(400).json({ error: 'Request body must contain an array of categories.' });
+  const normalizedCategories = [];
+  for (const item of categories) {
+    if (!item || typeof item.category !== 'string' ||
+        !item.category.trim() || item.category.trim().length > MAX_CATEGORY_NAME ||
+        !Number.isSafeInteger(item.sizeBytes) || item.sizeBytes < 0) {
+      return res.status(400).json({ error: 'Each category requires a name and a non-negative safe-integer sizeBytes value.' });
+    }
+    normalizedCategories.push({ category: item.category.trim(), sizeBytes: item.sizeBytes });
   }
 
   try {
-    // 1. Calculate cumulative size metrics
-    let totalSizeBytes = 0;
-    const formattedCategoriesString = categories.map(cat => {
-      const sizeStr = formatBytes(cat.sizeBytes);
-      totalSizeBytes += cat.sizeBytes;
-      return `- ${cat.category}: ${sizeStr}`;
-    }).join('\n');
+    const totalSizeBytes = normalizedCategories.reduce((sum, item) => sum + item.sizeBytes, 0);
+    if (!Number.isSafeInteger(totalSizeBytes)) return res.status(400).json({ error: 'The combined scan size is too large.' });
 
+    const formattedCategoriesString = normalizedCategories
+      .map((item) => `- ${item.category}: ${formatBytes(item.sizeBytes)}`)
+      .join('\n');
     const totalSizeStr = formatBytes(totalSizeBytes);
-
-    // 2. Formulate dynamic prompt for Gemini
-    const systemPrompt = "You are a friendly, highly intelligent Smart Cleaner storage assistant for Android devices.";
-    const userPrompt = `The user completed a system storage scan. Here is the size details per folder category:
+    const systemPrompt = 'You are a friendly, highly intelligent Smart Cleaner storage assistant for Android devices.';
+    const userPrompt = `The user completed a system storage scan. Here are the size details per folder category:
 ${formattedCategoriesString}
 Total potential space to reclaim: ${totalSizeStr}
 
-Recommend a specific priority hierarchy of what the user should clean first. Keep it light, visual, and action-oriented.
-Guidelines:
-1. Advise clearing "Cache" and "Temp Files" first since they won't harm user data.
-2. Recommend running the Duplicate Finder for duplicate files next to restore space effortlessly.
-3. Suggest caution before deleting large custom images/downloaded APKs unless older than 30 days.
-Write the exact layout steps in a maximum of 4 short bullet points. Do not include introductory text, just jump straight to the action items.`;
+Recommend a priority hierarchy. Advise reviewing cache and temporary files first, duplicates next, and personal media carefully. Give at most 4 short bullet points.`;
 
-    let recommendations = "";
-
-    // 3. Request AI recommendations via Google Gemini SDK
+    let recommendations = '';
     const apiKey = process.env.GEMINI_API_KEY;
-    if (apiKey && apiKey !== 'your_gemini_api_key_here' && apiKey.trim() !== '') {
+    if (apiKey && apiKey !== 'your_gemini_api_key_here') {
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-          model: 'gemini-3.5-flash',
-          systemInstruction: systemPrompt
+          model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+          systemInstruction: systemPrompt,
         });
-
         const result = await model.generateContent({
           contents: [{ parts: [{ text: userPrompt }] }],
-          generationConfig: {
-            temperature: 0.5,
-            maxOutputTokens: 350,
-          }
+          generationConfig: { temperature: 0.5, maxOutputTokens: 350 },
         });
-
-        const responseText = result.response.text();
-        if (responseText && responseText.trim() !== "") {
-          recommendations = responseText.trim();
-        }
-      } catch (geminiError) {
-        console.error('Gemini API request failed, using intelligent rule engine fallback:', geminiError.message);
+        recommendations = result.response.text().trim();
+      } catch (error) {
+        console.warn('Gemini recommendation failed; using local guidance:', error.message);
       }
     }
 
-    // 4. Custom rule-based backup Generator if Gemini is unavailable
     if (!recommendations) {
+      const cacheBytes = normalizedCategories.find((item) => item.category.toLowerCase() === 'cache')?.sizeBytes || 0;
+      const duplicateBytes = normalizedCategories.find((item) => item.category.toLowerCase() === 'duplicates')?.sizeBytes || 0;
       recommendations = [
-        `🧹 **Step 1:** Clear temporary app caches first (saves ${formatBytes(categories.find(c => c.category === 'Cache')?.sizeBytes || 0)}). Safe and fast.`,
-        `👥 **Step 2:** De-duplicate your space! Review redundant photos to win back ${formatBytes(categories.find(c => c.category === 'Duplicates')?.sizeBytes || 0)} instantly.`,
-        `📦 **Step 3:** Purge downloaded setup files (.apk) older than 30 days to free heavy overhead.`,
-        `⚠️ **Note:** Review any large media files manually to ensure you do not lose important memories.`
+        `Step 1: Review temporary cache files first (${formatBytes(cacheBytes)} detected).`,
+        `Step 2: Review duplicate photos before deleting (${formatBytes(duplicateBytes)} detected).`,
+        'Step 3: Check downloaded installers and APKs individually before removal.',
+        'Step 4: Review personal photos and videos carefully; never delete them automatically.',
       ].join('\n');
     }
 
-    // 5. Store session to maintain chronological records
     const newSession = new ScanSession({
       userId: req.user._id,
-      categories,
+      categories: normalizedCategories,
       totalSizeBytes,
       recommendations,
     });
     await newSession.save();
 
-    res.json({
+    return res.json({
       sessionId: newSession._id,
       totalSizeBytes,
       totalSizeFormatted: totalSizeStr,
       recommendations,
       createdAt: newSession.createdAt,
     });
-
   } catch (error) {
-    console.error('Failed to process scan stats:', error);
-    res.status(500).json({ error: 'Failed to run storage analysis and produce advice.' });
+    console.error('Failed to process scan stats:', error.message);
+    return res.status(500).json({ error: 'Failed to run storage analysis and produce advice.' });
   }
 });
 

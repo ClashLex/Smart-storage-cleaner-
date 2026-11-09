@@ -21,19 +21,12 @@ data class DeviceInfo(
 
 @Keep
 data class AuthSyncRequest(
-    val idToken: String,
     val device: DeviceInfo
 )
 
 @Keep
-data class AuthSyncResponse(
-    val user: User,
-    val token: String
-)
-
-@Keep
 data class SubscriptionState(
-    val activeProduct: String?, // "cleaner_pro_monthly", "cleaner_pro_annual", "cleaner_lifetime"
+    val activeProduct: String?,
     val isPremium: Boolean,
     val expiryTime: Long
 )

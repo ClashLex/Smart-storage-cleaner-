@@ -12,19 +12,7 @@ interface UserRecord {
   hasAdminPrivilege: boolean;
 }
 
-// Prepopulate standard visual user list for search & filters demonstrations
-const initialUsers: UserRecord[] = [
-  { id: 'usr-1', name: 'Muhammed Ansil', email: 'ansilmuhammed919@gmail.com', premiumEntitled: true, gbFreed: 4.82, lastSeen: '2026-05-23 17:05', createdDate: '2026-05-15', hasAdminPrivilege: true },
-  { id: 'usr-2', name: 'Leila Vance', email: 'leila.vance@gmail.com', premiumEntitled: true, gbFreed: 32.10, lastSeen: '2026-05-23 12:40', createdDate: '2026-05-01', hasAdminPrivilege: false },
-  { id: 'usr-3', name: 'Devon Carter', email: 'devon.carter@tech.co', premiumEntitled: false, gbFreed: 1.25, lastSeen: '2026-05-22 09:15', createdDate: '2026-05-12', hasAdminPrivilege: false },
-  { id: 'usr-4', name: 'Sarah Jenkins', email: 'sarah.j@outlook.com', premiumEntitled: true, gbFreed: 18.44, lastSeen: '2026-05-23 16:30', createdDate: '2026-04-20', hasAdminPrivilege: false },
-  { id: 'usr-5', name: 'Tariq Rashid', email: 'tariq@rashid.io', premiumEntitled: false, gbFreed: 0.00, lastSeen: '2026-05-21 14:00', createdDate: '2026-05-21', hasAdminPrivilege: false },
-  { id: 'usr-6', name: 'Elena Rostova', email: 'elena.rostova@yandex.com', premiumEntitled: true, gbFreed: 54.02, lastSeen: '2026-05-23 15:55', createdDate: '2026-04-05', hasAdminPrivilege: false },
-  { id: 'usr-7', name: 'Chloe Fontaine', email: 'c.fontaine@orange.fr', premiumEntitled: false, gbFreed: 2.10, lastSeen: '2026-05-18 10:12', createdDate: '2026-05-08', hasAdminPrivilege: false },
-  { id: 'usr-8', name: 'Marcus Brody', email: 'brody.m@indy.edu', premiumEntitled: false, gbFreed: 0.45, lastSeen: '2026-05-22 18:22', createdDate: '2026-05-19', hasAdminPrivilege: false },
-  { id: 'usr-9', name: 'Akiro Tanaka', email: 'tanaka.a@sony.co.jp', premiumEntitled: true, gbFreed: 92.51, lastSeen: '2026-05-23 08:31', createdDate: '2026-03-24', hasAdminPrivilege: false },
-  { id: 'usr-10', name: 'Gary Patel', email: 'gary.patel@gmail.com', premiumEntitled: false, gbFreed: 8.70, lastSeen: '2026-05-20 11:45', createdDate: '2026-05-02', hasAdminPrivilege: false },
-];
+const initialUsers: UserRecord[] = [];
 
 interface UsersProps {
   onSelectUser: (userId: string) => void;
@@ -38,11 +26,9 @@ export default function Users({ onSelectUser, token }: UsersProps) {
     const fetchUsers = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const adminSecret = import.meta.env.VITE_ADMIN_SECRET_KEY || 'highly_secure_admin_bypass_token';
         const response = await fetch(`${apiUrl}/api/admin/users`, {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'x-admin-secret': adminSecret
           }
         });
         if (response.ok) {
@@ -52,7 +38,7 @@ export default function Users({ onSelectUser, token }: UsersProps) {
           }
         }
       } catch (err) {
-        // Fallback silently to initialUsers preloaded state
+        setUsers([]);
       }
     };
     fetchUsers();

@@ -34,77 +34,18 @@ interface UserDetailRecord {
   }>;
 }
 
-// Map user datasets for high quality detail presentation
-const preloadedDetailCache: Record<string, UserDetailRecord> = {
-  'usr-1': {
-    id: 'usr-1',
-    name: 'Muhammed Ansil',
-    email: 'ansilmuhammed919@gmail.com',
-    premiumEntitled: true,
-    hasAdminPrivilege: true,
-    gbFreed: 4.82,
-    lastSeen: '2026-05-23 17:05',
-    createdDate: '2026-05-15',
-    subscriptionHistory: [
-      { id: 'sub-x1', productId: 'premium_annual', orderId: 'GPA.5539-2183-1123', status: 'active', purchaseDate: '2026-05-15', expiryDate: '2027-05-15' }
-    ]
-  },
-  'usr-2': {
-    id: 'usr-2',
-    name: 'Leila Vance',
-    email: 'leila.vance@gmail.com',
-    premiumEntitled: true,
-    hasAdminPrivilege: false,
-    gbFreed: 32.10,
-    lastSeen: '2026-05-23 12:40',
-    createdDate: '2026-05-01',
-    subscriptionHistory: [
-      { id: 'sub-x2', productId: 'premium_monthly', orderId: 'GPA.1232-4412-8821', status: 'active', purchaseDate: '2026-05-01', expiryDate: '2026-06-01' }
-    ]
-  },
-  'usr-3': {
-    id: 'usr-3',
-    name: 'Devon Carter',
-    email: 'devon.carter@tech.co',
+export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
+  const [user, setUser] = useState<UserDetailRecord>({
+    id: userId,
+    name: 'Loading user...',
+    email: '',
     premiumEntitled: false,
     hasAdminPrivilege: false,
-    gbFreed: 1.25,
-    lastSeen: '2026-05-22 09:15',
-    createdDate: '2026-05-12',
-    subscriptionHistory: []
-  },
-  'usr-4': {
-    id: 'usr-4',
-    name: 'Sarah Jenkins',
-    email: 'sarah.j@outlook.com',
-    premiumEntitled: true,
-    hasAdminPrivilege: false,
-    gbFreed: 18.44,
-    lastSeen: '2026-05-23 16:30',
-    createdDate: '2026-04-20',
-    subscriptionHistory: [
-      { id: 'sub-x4', productId: 'premium_weekly', orderId: 'GPA.9042-3321-4122', status: 'cancelled', purchaseDate: '2026-04-20', expiryDate: '2026-04-27' }
-    ]
-  }
-};
-
-export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
-  // Graceful fallback profile generator
-  const getInitialUser = () => {
-    return preloadedDetailCache[userId] || {
-      id: userId,
-      name: 'Simulated Sandbox User',
-      email: 'sandbox@example.com',
-      premiumEntitled: false,
-      hasAdminPrivilege: false,
-      gbFreed: 8.44,
-      lastSeen: '2026-05-23 15:00',
-      createdDate: '2026-05-18',
-      subscriptionHistory: []
-    };
-  };
-
-  const [user, setUser] = useState<UserDetailRecord>(getInitialUser());
+    gbFreed: 0,
+    lastSeen: '—',
+    createdDate: '—',
+    subscriptionHistory: [],
+  });
   const [_synced, setSynced] = useState(false);
   const [actionInfo, setActionInfo] = useState<string | null>(null);
 
@@ -113,11 +54,9 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
     const fetchFreshUser = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const adminSecret = import.meta.env.VITE_ADMIN_SECRET_KEY || 'highly_secure_admin_bypass_token';
         const response = await fetch(`${apiUrl}/api/admin/users/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'x-admin-secret': adminSecret
           }
         });
         if (response.ok) {
@@ -147,7 +86,7 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
     setActionInfo("Granting complimentary premium membership...");
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      await fetch(`${apiUrl}/api/admin/users/${userId}/comp-premium`, {
+      const response = await fetch(`${apiUrl}/api/admin/users/${userId}/comp-premium`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,12 +94,11 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
         }
       });
       
+      if (!response.ok) throw new Error(`Request failed (HTTP ${response.status}).`);
       setUser(prev => ({ ...prev, premiumEntitled: !prev.premiumEntitled }));
       setActionInfo(user.premiumEntitled ? "Premium revoked successfully." : "Complimentary premium status granted.");
-    } catch (_) {
-      // Local demo bypass logic
-      setUser(prev => ({ ...prev, premiumEntitled: !prev.premiumEntitled }));
-      setActionInfo(!user.premiumEntitled ? "Success: Premium entitlement granted." : "Success: Revoked premium status.");
+    } catch (error) {
+      setActionInfo(error instanceof Error ? error.message : 'Premium update failed.');
     }
   };
 
@@ -169,18 +107,18 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
     setActionInfo("Updating account security policy...");
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      await fetch(`${apiUrl}/api/admin/users/${userId}/grant-admin`, {
+      const response = await fetch(`${apiUrl}/api/admin/users/${userId}/grant-admin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
+      if (!response.ok) throw new Error(`Request failed (HTTP ${response.status}).`);
       setUser(prev => ({ ...prev, hasAdminPrivilege: !prev.hasAdminPrivilege }));
       setActionInfo(user.hasAdminPrivilege ? "Admin access revoked." : "Administrator privileges successfully granted.");
-    } catch (_) {
-      setUser(prev => ({ ...prev, hasAdminPrivilege: !prev.hasAdminPrivilege }));
-      setActionInfo(!user.hasAdminPrivilege ? "Success: Executive Admin status set." : "Success: Restored account to Standard user.");
+    } catch (error) {
+      setActionInfo(error instanceof Error ? error.message : 'Role update failed.');
     }
   };
 
@@ -192,21 +130,19 @@ export default function UserDetail({ userId, onBack, token }: UserDetailProps) {
     setActionInfo("Initializing cascading DB account purge...");
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      await fetch(`${apiUrl}/api/admin/users/${userId}`, {
+      const response = await fetch(`${apiUrl}/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      setActionInfo("Cascading account purge complete. Redirecting...");
+      if (!response.ok) throw new Error(`Request failed (HTTP ${response.status}).`);
+      setActionInfo("Account deleted. Redirecting...");
       setTimeout(() => {
         onBack();
       }, 1500);
-    } catch (_) {
-      setActionInfo("Sandbox account deleted successfully.");
-      setTimeout(() => {
-        onBack();
-      }, 1500);
+    } catch (error) {
+      setActionInfo(error instanceof Error ? error.message : 'Account deletion failed.');
     }
   };
 
