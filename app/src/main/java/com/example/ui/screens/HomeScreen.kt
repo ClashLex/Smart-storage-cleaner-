@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ChevronRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -136,7 +135,7 @@ fun HomeScreen(
                                 Text("Scan complete", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                                 Text("$duplicateCount possible duplicates · " + formatBytes(duplicateBytes) + " to review", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                             }
-                            Icon(Icons.AutoMirrored.Filled.ChevronRight, contentDescription = "Review results", tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Icon(Icons.Default.ChevronRight, contentDescription = "Review results", tint = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     }
                 }
@@ -191,7 +190,7 @@ private fun CategoryRow(title: String, value: String, icon: androidx.compose.ui.
                 Text(title, style = MaterialTheme.typography.titleSmall)
                 Text(value, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Icon(Icons.AutoMirrored.Filled.ChevronRight, contentDescription = "Open " + title, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(Icons.Default.ChevronRight, contentDescription = "Open " + title, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

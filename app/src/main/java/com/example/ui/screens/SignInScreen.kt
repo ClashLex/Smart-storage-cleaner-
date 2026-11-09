@@ -60,6 +60,8 @@ fun SignInScreen(
         }
     }
 
+    val glowColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -73,7 +75,7 @@ fun SignInScreen(
                 .fillMaxSize()
                 .drawBehind {
                     val brush = Brush.radialGradient(
-                        colors = listOf(MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f), Color.Transparent),
+                        colors = listOf(glowColor, Color.Transparent),
                         center = Offset(size.width * 0.5f, size.height * 0.15f),
                         radius = size.width * 0.8f
                     )
