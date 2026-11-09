@@ -60,10 +60,12 @@ fun SignInScreen(
         }
     }
 
+    val glowColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(DarkBackground)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
@@ -73,7 +75,7 @@ fun SignInScreen(
                 .fillMaxSize()
                 .drawBehind {
                     val brush = Brush.radialGradient(
-                        colors = listOf(QuantumBlue.copy(alpha = 0.15f), Color.Transparent),
+                        colors = listOf(glowColor, Color.Transparent),
                         center = Offset(size.width * 0.5f, size.height * 0.15f),
                         radius = size.width * 0.8f
                     )
@@ -102,25 +104,25 @@ fun SignInScreen(
                     modifier = Modifier
                         .size(96.dp)
                         .background(
-                            Brush.linearGradient(listOf(CyberPrimary, QuantumBlue)),
+                            Brush.linearGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)),
                             CircleShape
                         )
                         .padding(3.dp)
-                        .background(DarkBackground, CircleShape),
+                        .background(MaterialTheme.colorScheme.background, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
                         modifier = Modifier
                             .size(72.dp)
-                            .background(QuantumBlue.copy(alpha = 0.15f), CircleShape)
-                            .border(1.dp, CyberPrimary.copy(alpha = 0.5f), CircleShape),
+                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f), CircleShape)
+                            .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Shield,
                             contentDescription = "Shield Guard AI Logo",
                             modifier = Modifier.size(36.dp),
-                            tint = CyberPrimary
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -130,7 +132,7 @@ fun SignInScreen(
                 Text(
                     text = "SMART CLEANER",
                     style = MaterialTheme.typography.labelMedium,
-                    color = CyberPrimary,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp
                 )
@@ -141,7 +143,7 @@ fun SignInScreen(
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = (-0.5).sp
                     ),
-                    color = OnDarkBackground,
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 4.txtHeight())
                 )
@@ -149,7 +151,7 @@ fun SignInScreen(
                 Text(
                     text = "Privacy-first on-device intelligence. Never uploads photos or personal media to cloud servers. Zero data leaves your phone.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 12.dp, start = 16.dp, end = 16.dp)
                 )
@@ -164,19 +166,19 @@ fun SignInScreen(
             ) {
                 FeatureRow(
                     icon = Icons.Default.CheckCircle,
-                    iconColor = CyberPrimary,
+                    iconColor = MaterialTheme.colorScheme.primary,
                     title = "On-Device AI Scans",
                     subtitle = "Embeddings-based model runs completely on phone to group matches."
                 )
                 FeatureRow(
                     icon = Icons.Default.PhotoLibrary,
-                    iconColor = QuantumBlue,
+                    iconColor = MaterialTheme.colorScheme.secondary,
                     title = "Deep Photo Analysis",
                     subtitle = "Identifies duplicate structures, screenshots, and blurry files securely."
                 )
                 FeatureRow(
                     icon = Icons.Default.Lock,
-                    iconColor = ElectricPink,
+                    iconColor = MaterialTheme.colorScheme.tertiary,
                     title = "Tethered Local Authority",
                     subtitle = "No deletes without explicit confirmation. No random ads or scripts."
                 )
@@ -190,13 +192,13 @@ fun SignInScreen(
             ) {
                 if (uiState is AuthUiState.Loading) {
                     CircularProgressIndicator(
-                        color = CyberPrimary,
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(36.dp)
                     )
                     Text(
                         text = "Authenticating secure framework...",
                         style = MaterialTheme.typography.bodySmall,
-                        color = CyberPrimary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 } else {
                     // Standard Google Sign In UI Button
@@ -207,7 +209,7 @@ fun SignInScreen(
                             .height(52.dp)
                             .testTag("google_signin_button"),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = QuantumBlue,
+                            containerColor = MaterialTheme.colorScheme.secondary,
                             contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(12.dp),
@@ -235,18 +237,18 @@ fun SignInScreen(
                     ) {
                         HorizontalDivider(
                             modifier = Modifier.weight(1f),
-                            color = DarkSurfaceVariant.copy(alpha = 0.5f)
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                         )
                         Text(
                             text = "DEVELOPER SANDBOX BYPASS",
                             style = MaterialTheme.typography.labelSmall,
-                            color = TextSecondary.copy(alpha = 0.7f),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                             modifier = Modifier.padding(horizontal = 16.dp),
                             fontWeight = FontWeight.SemiBold
                         )
                         HorizontalDivider(
                             modifier = Modifier.weight(1f),
-                            color = DarkSurfaceVariant.copy(alpha = 0.5f)
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                         )
                     }
 
@@ -257,9 +259,9 @@ fun SignInScreen(
                             .fillMaxWidth()
                             .height(50.dp)
                             .testTag("dev_sandbox_bypass_button"),
-                        border = BorderStroke(1.dp, CyberPrimary.copy(alpha = 0.6f)),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = CyberPrimary
+                            contentColor = MaterialTheme.colorScheme.primary
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -279,7 +281,7 @@ fun SignInScreen(
                 Text(
                     text = "Protected with hardware-level security & Credential Manager verification. Powered by TFLite MobileNet v3.",
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 12.dp, bottom = 12.dp)
                 )
@@ -296,11 +298,11 @@ fun SignInScreen(
                     Icon(
                         imageVector = Icons.Default.Terminal,
                         contentDescription = "Dev Mode",
-                        tint = CyberPrimary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "AI Developer Sandbox", color = OnDarkBackground)
+                    Text(text = "AI Developer Sandbox", color = MaterialTheme.colorScheme.onBackground)
                 }
             },
             text = {
@@ -308,7 +310,7 @@ fun SignInScreen(
                     Text(
                         text = "Sign-in without Google Play Services. Enter metadata values to load state.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     OutlinedTextField(
                         value = sandboxName,
@@ -317,8 +319,8 @@ fun SignInScreen(
                         placeholder = { Text("Ansil Muhammed") },
                         shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = CyberPrimary,
-                            unfocusedBorderColor = DarkSurfaceVariant
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
                         modifier = Modifier.fillMaxWidth().testTag("sandbox_name_input")
                     )
@@ -329,8 +331,8 @@ fun SignInScreen(
                         placeholder = { Text("ansil@gmail.com") },
                         shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = CyberPrimary,
-                            unfocusedBorderColor = DarkSurfaceVariant
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
                         modifier = Modifier.fillMaxWidth().testTag("sandbox_email_input")
                     )
@@ -344,7 +346,7 @@ fun SignInScreen(
                         val name = sandboxName.trim().ifEmpty { "Ansil Muhammed" }
                         authViewModel.simulateSignInForTesting(email, name)
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary, contentColor = OnCyberPrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                     modifier = Modifier.testTag("sandbox_confirm_button")
                 ) {
                     Text("Unlock & Sync")
@@ -352,10 +354,10 @@ fun SignInScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showSandboxDialog = false }) {
-                    Text("Cancel", color = TextSecondary)
+                    Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
-            containerColor = DarkSurface,
+            containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 6.dp
         )
     }
@@ -373,8 +375,8 @@ fun FeatureRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(DarkSurfaceVariant.copy(alpha = 0.4f))
-            .border(1.dp, DarkSurfaceVariant.copy(alpha = 0.8f), RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+            .border(1.dp, MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f), RoundedCornerShape(14.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -396,12 +398,12 @@ fun FeatureRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = OnDarkBackground
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 16.sp,
                 modifier = Modifier.padding(top = 2.dp)
             )

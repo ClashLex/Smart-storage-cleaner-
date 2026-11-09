@@ -2,35 +2,21 @@ package com.example.ui.screens
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.widget.Toast
-import androidx.compose.animation.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import com.example.ui.theme.*
 import com.example.ui.viewmodel.CleanerViewModel
 import com.example.ui.viewmodel.ScanUiState
-import java.text.DecimalFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,542 +32,177 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val scanState by cleanerViewModel.scanState.collectAsState()
-    val allPhotos by cleanerViewModel.allPhotos.collectAsState()
     val duplicateGroups by cleanerViewModel.duplicateGroups.collectAsState()
     val blurryPhotos by cleanerViewModel.blurryPhotos.collectAsState()
-
-    val totalReclaimedBytes by cleanerViewModel.totalReclaimedBytes.collectAsState()
     val whatsappItems by cleanerViewModel.whatsappItems.collectAsState()
     val apkItems by cleanerViewModel.apkItems.collectAsState()
     val cacheItems by cleanerViewModel.cacheItems.collectAsState()
-
-    val whatsappSize = whatsappItems.sumOf { it.size }
-    val apkSize = apkItems.sumOf { it.size }
-    val cacheSize = cacheItems.sumOf { it.size }
-
     val storageStats by cleanerViewModel.storageStats.collectAsState()
-
-    val totalCapacity = storageStats.totalBytes
-    val currentUsedBytes = storageStats.usedBytes
-    val currentAvailableBytes = storageStats.availableBytes
-    val usedPercentage = (storageStats.usedPercentage).toInt().coerceIn(0, 100)
-
-    val duplicateBytesSize = duplicateGroups.flatMap { it.duplicates }.sumOf { it.fileSize }
+    val totalReclaimedBytes by cleanerViewModel.totalReclaimedBytes.collectAsState()
+    val duplicateCount = duplicateGroups.sumOf { it.duplicates.size }
+    val duplicateBytes = duplicateGroups.sumOf { group -> group.duplicates.sumOf { it.fileSize } }
+    val usedPercent = storageStats.usedPercentage.toInt().coerceIn(0, 100)
+    var showMenu by remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     Column {
-                        Text(
-                            text = "Smart Cleaner",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 24.sp,
-                            color = CyberPrimary,
-                            letterSpacing = (-0.5).sp
-                        )
-                        Text(
-                            text = "PRIVACY-FIRST AI",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp,
-                            color = OnDarkBackground.copy(alpha = 0.5f),
-                            letterSpacing = 1.5.sp
-                        )
+                        Text("Storage", style = MaterialTheme.typography.titleLarge)
+                        Text("Smart Cleaner", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = onNavigateToPaywall,
-                        modifier = Modifier.testTag("premium_upgrade_button")
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(Color(0x33B2D183), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Premium Upgrade",
-                                tint = CyberPrimary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+                    IconButton(onClick = onNavigateToPaywall, modifier = Modifier.testTag("premium_upgrade_button")) {
+                        Icon(Icons.Default.Star, contentDescription = "Upgrade")
                     }
-                    IconButton(
-                        onClick = onNavigateToSettings,
-                        modifier = Modifier.testTag("settings_button")
-                    ) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings", tint = OnDarkBackground)
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenuItem(text = { Text("Settings") }, leadingIcon = { Icon(Icons.Default.Settings, null) }, onClick = { showMenu = false; onNavigateToSettings() })
+                        DropdownMenuItem(text = { Text("Sign out") }, onClick = { showMenu = false; onLogout() })
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground,
-                    titleContentColor = OnDarkBackground
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = DarkBackground,
-        modifier = modifier
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(selected = true, onClick = { }, icon = { Icon(Icons.Default.Storage, null) }, label = { Text("Storage") })
+                NavigationBarItem(selected = false, onClick = onNavigateToDuplicates, icon = { Icon(Icons.Default.Image, null) }, label = { Text("Review") })
+                NavigationBarItem(selected = false, onClick = onNavigateToSettings, icon = { Icon(Icons.Default.Settings, null) }, label = { Text("Settings") })
+            }
+        }
+    ) { insets ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(insets).padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // 1. Storage Hero Card
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("storage_hero_card"),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = DarkSurface),
-                border = BorderStroke(1.dp, Color(0x0FFFFFFF))
-            ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    // Subtle glowing ambient light in upper-right corner
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .align(Alignment.TopEnd)
-                            .background(
-                                Brush.radialGradient(
-                                    colors = listOf(CyberPrimary.copy(alpha = 0.12f), Color.Transparent)
-                                )
-                            )
-                    )
-
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Available Storage",
-                                    fontSize = 14.sp,
-                                    color = OnDarkBackground.copy(alpha = 0.6f),
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(verticalAlignment = Alignment.Bottom) {
-                                    Text(
-                                        text = formatBytes(currentAvailableBytes),
-                                        fontSize = 32.sp,
-                                        fontWeight = FontWeight.Light,
-                                        color = CyberPrimary
-                                    )
-                                }
-                            }
-
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = "USED OF ${formatBytes(totalCapacity)}",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = OnDarkBackground.copy(alpha = 0.4f),
-                                    letterSpacing = 1.sp
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "$usedPercentage% Full",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = OnDarkBackground
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(18.dp))
-
-                        // Modern progress bar
-                        LinearProgressIndicator(
-                            progress = { usedPercentage / 100f },
-                            color = CyberPrimary,
-                            trackColor = DarkSurfaceVariant,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(12.dp)
-                                .clip(RoundedCornerShape(6.dp))
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .background(CyberPrimary, CircleShape)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = "System & Media",
-                                    fontSize = 12.sp,
-                                    color = OnDarkBackground.copy(alpha = 0.6f)
-                                )
-                            }
-
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .background(OnDarkBackground.copy(alpha = 0.2f), CircleShape)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = "Waste Cache",
-                                    fontSize = 12.sp,
-                                    color = OnDarkBackground.copy(alpha = 0.6f)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 2. Scan Status Overlay / Recommendation Banner
-            AnimatedVisibility(
-                visible = scanState is ScanUiState.Scanning,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                val progress = (scanState as? ScanUiState.Scanning)?.progress ?: 0
+            item { Spacer(Modifier.height(2.dp)) }
+            item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = DarkSurfaceVariant),
-                    border = BorderStroke(1.dp, CyberPrimary.copy(alpha = 0.2f))
+                    modifier = Modifier.fillMaxWidth().testTag("storage_hero_card"),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                    shape = MaterialTheme.shapes.extraLarge
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .background(CyberPrimary.copy(alpha = 0.15f), CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    progress = { progress / 100f },
-                                    color = CyberPrimary,
-                                    strokeWidth = 3.dp,
-                                    modifier = Modifier.size(24.dp)
-                                )
+                            Column(Modifier.weight(1f)) {
+                                Text("Available storage", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(formatBytes(storageStats.availableBytes), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "Analyzing Spatial Patterns...",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = OnDarkBackground
-                                )
-                                Text(
-                                    text = "Running on-device CNN embeddings ($progress%)",
-                                    fontSize = 11.sp,
-                                    color = OnDarkBackground.copy(alpha = 0.6f)
-                                )
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text("$usedPercent%", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
+                                Text("used", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
+                        }
+                        LinearProgressIndicator(progress = { usedPercent / 100f }, modifier = Modifier.fillMaxWidth().height(8.dp), color = MaterialTheme.colorScheme.primary, trackColor = MaterialTheme.colorScheme.surfaceVariant)
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Used " + formatBytes(storageStats.usedBytes), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("Total " + formatBytes(storageStats.totalBytes), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
             }
-
-            // AI Recommendation Banner (only visible if scanned)
-            AnimatedVisibility(
-                visible = scanState is ScanUiState.Scanned,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                listOf(CyberPrimary, ElectricPink)
-                            ),
-                            shape = RoundedCornerShape(24.dp)
-                        )
-                        .clickable { onNavigateToDuplicates() }
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(Color(0x22000000), RoundedCornerShape(16.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "✨", fontSize = 24.sp)
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "AI Optimization Ready",
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF0F110E),
-                            fontSize = 15.sp
-                        )
-                        Text(
-                            text = if (duplicateGroups.isNotEmpty()) {
-                                "Found ${duplicateGroups.flatMap { it.duplicates }.size} duplicates. Save ${formatFileSize(duplicateBytesSize)}"
-                            } else {
-                                "No duplicates found! Your library is optimized."
-                            },
-                            color = Color(0xFF0F110E).copy(alpha = 0.8f),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .background(Color(0x11000000), CircleShape)
-                            .border(1.dp, Color(0x33000000), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ChevronRight,
-                            contentDescription = "Optimize",
-                            tint = Color(0xFF0F110E)
-                        )
-                    }
-                }
+            item {
+                Text("Cleanup overview", style = MaterialTheme.typography.titleLarge)
+                Text(if (scanState is ScanUiState.Scanned) "Review the results before removing anything." else "Scan your device to find items you may want to review.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-
-            // 3. Space Wasters Grid
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "TOP WASTERS",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
-                        color = OnDarkBackground.copy(alpha = 0.4f)
-                    )
-                    Text(
-                        text = "View All",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = CyberPrimary,
-                        modifier = Modifier.clickable {
-                            if (scanState is ScanUiState.Scanned) {
-                                onNavigateToDuplicates()
-                            } else {
-                                Toast.makeText(context, "Please run cleanup scan first!", Toast.LENGTH_SHORT).show()
+            if (scanState is ScanUiState.Scanning) {
+                item {
+                    val progress = (scanState as? ScanUiState.Scanning)?.progress ?: 0
+                    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+                        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                            CircularProgressIndicator(progress = { progress / 100f }, modifier = Modifier.size(32.dp))
+                            Column(Modifier.padding(start = 16.dp)) {
+                                Text("Scanning storage", style = MaterialTheme.typography.titleMedium)
+                                Text("$progress% complete", style = MaterialTheme.typography.bodyMedium)
                             }
                         }
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // WhatsApp
-                    WasterGridCell(
-                        modifier = Modifier.weight(1f),
-                        emoji = "💬",
-                        category = "WhatsApp",
-                        savings = formatFileSize(whatsappSize),
-                        backgroundTint = Color(0xFF2E7D32),
-                        onClick = { onNavigateToJunk("WhatsApp") }
-                    )
-
-                    // Blurry Media (Dynamic from scannings!)
-                    WasterGridCell(
-                        modifier = Modifier.weight(1f),
-                        emoji = "🎞️",
-                        category = "Blurry Media",
-                        savings = if (scanState is ScanUiState.Scanned) {
-                            formatFileSize(blurryPhotos.sumOf { it.fileSize })
-                        } else {
-                            "2.8 GB"
-                        },
-                        backgroundTint = Color(0xFF1565C0),
-                        onClick = { onNavigateToJunk("Blurry Media") }
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Old APKs
-                    WasterGridCell(
-                        modifier = Modifier.weight(1f),
-                        emoji = "⚙️",
-                        category = "Old APKs",
-                        savings = formatFileSize(apkSize),
-                        backgroundTint = Color(0xFFE65100),
-                        onClick = { onNavigateToJunk("Old APKs") }
-                    )
-
-                    // App Cache
-                    WasterGridCell(
-                        modifier = Modifier.weight(1f),
-                        emoji = "🗑️",
-                        category = "App Cache",
-                        savings = formatFileSize(cacheSize),
-                        backgroundTint = Color(0xFF6A1B9A),
-                        onClick = { onNavigateToJunk("App Cache") }
-                    )
+                    }
                 }
             }
-
-            // 4. Bottom Main Performance Cleanup trigger button
-            Button(
-                onClick = {
-                    if (scanState is ScanUiState.Scanned) {
-                        onNavigateToDuplicates()
-                    } else {
-                        // Check if system storage permissions are granted before commencing scan
-                        if (hasPermissions(context)) {
-                            cleanerViewModel.startScan()
-                        } else {
-                            onNavigateToPermission()
+            if (scanState is ScanUiState.Scanned) {
+                item {
+                    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Shield, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
+                                Text("Scan complete", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                                Text("$duplicateCount possible duplicates · " + formatBytes(duplicateBytes) + " to review", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            }
+                            Icon(Icons.Default.ChevronRight, contentDescription = "Review results", tint = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .testTag("begin_cleanup_button"),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = CyberPrimary,
-                    contentColor = OnCyberPrimary
-                ),
-                shape = RoundedCornerShape(24.dp),
-                border = BorderStroke(1.dp, Color(0x22FFFFFF))
-            ) {
-                Icon(
-                    imageVector = if (scanState is ScanUiState.Scanned) Icons.Default.DoneAll else Icons.Default.OfflineBolt,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = if (scanState is ScanUiState.Scanned) "View Duplicate Clusters" else "Begin Safe Cleanup Scan",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 18.sp
-                )
+                }
             }
-
-            // Engine feedback indicator
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Shield,
-                    contentDescription = null,
-                    tint = KeeperGreen,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "On-Device Neural Model Match: 100% Private",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = KeeperGreen,
-                    fontWeight = FontWeight.Medium
-                )
+            item { Text("Categories", style = MaterialTheme.typography.titleLarge) }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    CategoryRow("WhatsApp media", formatBytes(whatsappItems.sumOf { it.size }), Icons.Default.Folder) { onNavigateToJunk("WhatsApp") }
+                    CategoryRow("App installers", formatBytes(apkItems.sumOf { it.size }), Icons.Default.CleaningServices) { onNavigateToJunk("Old APKs") }
+                    CategoryRow("App cache", formatBytes(cacheItems.sumOf { it.size }), Icons.Default.Storage) { onNavigateToJunk("App Cache") }
+                    CategoryRow("Blurry photos", if (scanState is ScanUiState.Scanned) blurryPhotos.size.toString() + " items" else "Not scanned", Icons.Default.VideoLibrary) { onNavigateToJunk("Blurry Media") }
+                }
             }
-
-            TextButton(
-                onClick = onLogout,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("Sign Out Secure Session", color = OnDarkBackground.copy(alpha = 0.4f), fontSize = 12.sp)
+            item {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text("Privacy by design", style = MaterialTheme.typography.titleMedium)
+                        Text("Your scan runs on this device. Review every suggested item before cleanup.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+            item {
+                Button(
+                    onClick = {
+                        if (scanState is ScanUiState.Scanned) onNavigateToDuplicates()
+                        else if (hasPermissions(context)) cleanerViewModel.startScan()
+                        else onNavigateToPermission()
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp).testTag("begin_cleanup_button"),
+                    shape = MaterialTheme.shapes.extraLarge
+                ) {
+                    Icon(Icons.Default.Dashboard, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(if (scanState is ScanUiState.Scanned) "Review scan results" else "Scan storage")
+                }
+            }
+            item {
+                if (totalReclaimedBytes > 0) {
+                    Text(formatBytes(totalReclaimedBytes) + " reclaimed so far", modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                } else Spacer(Modifier.height(8.dp))
             }
         }
     }
 }
 
 @Composable
-fun WasterGridCell(
-    modifier: Modifier = Modifier,
-    emoji: String,
-    category: String,
-    savings: String,
-    backgroundTint: Color,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = modifier
-            .fillMaxHeight()
-            .testTag("waster_card_$category")
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        shape = RoundedCornerShape(28.dp),
-        border = BorderStroke(1.dp, Color(0x3BFFFFFF))
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(backgroundTint.copy(alpha = 0.15f), RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = emoji, fontSize = 18.sp)
+private fun CategoryRow(title: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow), shape = MaterialTheme.shapes.large) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Column(Modifier.weight(1f).padding(horizontal = 16.dp)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                Text(value, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-
-            Column {
-                Text(
-                    text = category,
-                    fontSize = 13.sp,
-                    color = OnDarkBackground.copy(alpha = 0.5f),
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = savings,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = OnDarkBackground
-                )
-            }
+            Icon(Icons.Default.ChevronRight, contentDescription = "Open " + title, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
-}
-
-private fun formatDecimal(value: Double): String {
-    val df = DecimalFormat("0.0")
-    return df.format(value)
 }
 
 fun hasPermissions(context: Context): Boolean {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
-        ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED ||
-        ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED
     } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
         ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
-        ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
     } else {
         ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }

@@ -111,7 +111,7 @@ fun JunkCleanerScreen(
                         Text(
                             text = "On-Device Neural Sanitation",
                             style = MaterialTheme.typography.bodySmall,
-                            color = CyberPrimary,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Normal
                         )
                     }
@@ -145,20 +145,20 @@ fun JunkCleanerScreen(
                             }
                             Text(
                                 text = if (allChecked) "Deselect All" else "Select All",
-                                color = CyberPrimary,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground,
-                    titleContentColor = OnDarkBackground,
-                    navigationIconContentColor = OnDarkBackground
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             if (activeCategory == "Blurry Media" && scanState is ScanUiState.Scanned && selectedBlurryUris.isNotEmpty()) {
                 BottomActionBar(
@@ -214,13 +214,13 @@ fun JunkCleanerScreen(
             // Category Slider Row
             ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
-                containerColor = DarkBackground,
-                contentColor = CyberPrimary,
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.primary,
                 edgePadding = 16.dp,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
                         modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                        color = CyberPrimary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 },
                 divider = { HorizontalDivider(color = Color(0x11FFFFFF)) }
@@ -241,8 +241,8 @@ fun JunkCleanerScreen(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(
-                                            if (selectedTabIndex == index) CyberPrimary.copy(alpha = 0.15f)
-                                            else DarkSurfaceVariant
+                                            if (selectedTabIndex == index) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                            else MaterialTheme.colorScheme.surfaceVariant
                                         )
                                         .padding(horizontal = 6.dp, vertical = 2.dp)
                                 ) {
@@ -256,13 +256,13 @@ fun JunkCleanerScreen(
                                         },
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = if (selectedTabIndex == index) CyberPrimary else TextSecondary
+                                        color = if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
                         },
-                        selectedContentColor = CyberPrimary,
-                        unselectedContentColor = TextSecondary,
+                        selectedContentColor = MaterialTheme.colorScheme.primary,
+                        unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.testTag("tab_$title")
                     )
                 }
@@ -286,7 +286,7 @@ fun JunkCleanerScreen(
                     } else if (blurryPhotos.isEmpty()) {
                         FullScreenMessagePlaceholder(
                             icon = Icons.Default.CheckCircle,
-                            iconColor = KeeperGreen,
+                            iconColor = MaterialTheme.colorScheme.tertiary,
                             title = "No Blurry Files!",
                             description = "Excellent focus across your library! On-device camera matches indicate zero blurred images are taking up space.",
                             showButton = false
@@ -325,7 +325,7 @@ fun JunkCleanerScreen(
                     if (activeList.isEmpty()) {
                         FullScreenMessagePlaceholder(
                             icon = Icons.Default.OfflinePin,
-                            iconColor = KeeperGreen,
+                            iconColor = MaterialTheme.colorScheme.tertiary,
                             title = "Storage Cleaned & Optimized",
                             description = "All space wasters in this category have been sanitized. Your active partition is fully optimized.",
                             showButton = false
@@ -392,7 +392,7 @@ fun InfoHeaderCard(
     savingsString: String
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(1.dp, Color(0x0FFFFFFF)),
         modifier = Modifier
@@ -406,7 +406,7 @@ fun InfoHeaderCard(
             Box(
                 modifier = Modifier
                     .size(56.dp)
-                    .background(CyberPrimary.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = emoji, fontSize = 28.sp)
@@ -417,12 +417,12 @@ fun InfoHeaderCard(
                     text = title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = OnDarkBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
                     text = subtitle,
                     fontSize = 11.sp,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 16.sp,
                     modifier = Modifier.padding(top = 2.dp)
                 )
@@ -431,12 +431,12 @@ fun InfoHeaderCard(
                     Box(
                         modifier = Modifier
                             .size(6.dp)
-                            .background(ElectricPink, CircleShape)
+                            .background(MaterialTheme.colorScheme.tertiary, CircleShape)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Potential Savings: $savingsString",
-                        color = ElectricPink,
+                        color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp
                     )
@@ -455,8 +455,8 @@ fun JunkListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(DarkSurface.copy(alpha = 0.2f))
-            .border(1.dp, DarkSurfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f))
+            .border(1.dp, MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
             .clickable { onToggle() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -464,7 +464,7 @@ fun JunkListItem(
         Box(
             modifier = Modifier
                 .size(44.dp)
-                .background(DarkSurfaceVariant, RoundedCornerShape(10.dp)),
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(10.dp)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -472,7 +472,7 @@ fun JunkListItem(
                 else if (item.name.endsWith(".apk")) Icons.Default.SettingsApplications
                 else Icons.Default.FolderOpen,
                 contentDescription = null,
-                tint = CyberPrimary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -484,20 +484,20 @@ fun JunkListItem(
                 text = item.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
-                color = OnDarkBackground,
+                color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1
             )
             Text(
                 text = item.detail,
                 fontSize = 11.sp,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 modifier = Modifier.padding(top = 2.dp)
             )
             Text(
                 text = "${item.dateString} • ${formatFileSize(item.size)}",
                 fontSize = 10.sp,
-                color = TextSecondary.copy(alpha = 0.6f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 modifier = Modifier.padding(top = 1.dp)
             )
         }
@@ -506,9 +506,9 @@ fun JunkListItem(
             checked = item.checked,
             onCheckedChange = { onToggle() },
             colors = CheckboxDefaults.colors(
-                checkedColor = CyberPrimary,
-                uncheckedColor = TextSecondary,
-                checkmarkColor = OnCyberPrimary
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                checkmarkColor = MaterialTheme.colorScheme.onPrimary
             ),
             modifier = Modifier.testTag("junk_select_${item.id}")
         )
@@ -525,8 +525,8 @@ fun BlurryPhotoListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(DarkSurface.copy(alpha = 0.2f))
-            .border(1.dp, DarkSurfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f))
+            .border(1.dp, MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
             .clickable { onToggle() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -534,13 +534,13 @@ fun BlurryPhotoListItem(
         Box(
             modifier = Modifier
                 .size(52.dp)
-                .background(DarkSurfaceVariant, RoundedCornerShape(10.dp)),
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(10.dp)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.BlurOn,
                 contentDescription = null,
-                tint = TextSecondary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
             Box(
@@ -568,7 +568,7 @@ fun BlurryPhotoListItem(
                 text = photo.fileName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
-                color = OnDarkBackground,
+                color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1
             )
             Spacer(modifier = Modifier.height(2.dp))
@@ -582,14 +582,14 @@ fun BlurryPhotoListItem(
                         text = "BLURRY SCORE %.1f".format(photo.blurScore),
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
-                        color = ErrorRed
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = formatFileSize(photo.fileSize),
                     fontSize = 11.sp,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -598,9 +598,9 @@ fun BlurryPhotoListItem(
             checked = isSelected,
             onCheckedChange = { onToggle() },
             colors = CheckboxDefaults.colors(
-                checkedColor = CyberPrimary,
-                uncheckedColor = TextSecondary,
-                checkmarkColor = OnCyberPrimary
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                checkmarkColor = MaterialTheme.colorScheme.onPrimary
             ),
             modifier = Modifier.testTag("blurry_select_${photo.uri}")
         )
@@ -616,7 +616,7 @@ fun BottomActionBar(
     onAction: () -> Unit
 ) {
     Surface(
-        color = DarkSurface,
+        color = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp,
         border = BorderStroke(1.dp, Color(0x1AFFFFFF)),
         modifier = Modifier.fillMaxWidth()
@@ -634,13 +634,13 @@ fun BottomActionBar(
                 Column {
                     Text(
                         text = "$selectedCount files selected",
-                        color = OnDarkBackground,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = "Saves ${formatFileSize(savingsBytes)}",
-                        color = ElectricPink,
+                        color = MaterialTheme.colorScheme.tertiary,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -649,8 +649,8 @@ fun BottomActionBar(
                 Button(
                     onClick = onAction,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CyberPrimary,
-                        contentColor = OnCyberPrimary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier
@@ -670,7 +670,7 @@ fun BottomActionBar(
 @Composable
 fun FullScreenMessagePlaceholder(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    iconColor: Color = TextSecondary,
+    iconColor: Color = Color.Gray,
     title: String,
     description: String,
     showButton: Boolean = true,
@@ -698,14 +698,14 @@ fun FullScreenMessagePlaceholder(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = OnDarkBackground,
+                color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 lineHeight = 20.sp
             )
@@ -714,8 +714,8 @@ fun FullScreenMessagePlaceholder(
                 Button(
                     onClick = onAction,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CyberPrimary,
-                        contentColor = OnCyberPrimary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -739,7 +739,7 @@ fun FullProgressScanningView(progress: Int) {
             modifier = Modifier.padding(16.dp)
         ) {
             CircularProgressIndicator(
-                color = CyberPrimary,
+                color = MaterialTheme.colorScheme.primary,
                 strokeWidth = 6.dp,
                 modifier = Modifier.size(80.dp)
             )
@@ -748,21 +748,21 @@ fun FullProgressScanningView(progress: Int) {
                 text = "Aligning Cognitive Layers...",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = OnDarkBackground,
+                color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Processing perceptual Laplacian blur scores ($progress%)",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(16.dp))
             LinearProgressIndicator(
                 progress = { progress / 100f },
-                color = CyberPrimary,
-                trackColor = DarkSurfaceVariant,
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(6.dp)

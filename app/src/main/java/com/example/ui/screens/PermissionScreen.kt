@@ -110,18 +110,18 @@ fun PermissionScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = OnDarkBackground
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground,
-                    titleContentColor = OnDarkBackground,
-                    navigationIconContentColor = OnDarkBackground
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
         Box(
@@ -140,7 +140,7 @@ fun PermissionScreen(
                 Box(
                     modifier = Modifier
                         .size(120.dp)
-                        .background(CyberPrimary.copy(alpha = 0.08f), CircleShape),
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
@@ -149,7 +149,7 @@ fun PermissionScreen(
                             .background(
                                 Brush.radialGradient(
                                     colors = listOf(
-                                        CyberPrimary.copy(alpha = 0.2f),
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                                         Color.Transparent
                                     )
                                 ),
@@ -160,7 +160,7 @@ fun PermissionScreen(
                         Icon(
                             imageVector = Icons.Default.PhotoLibrary,
                             contentDescription = "Storage Access Icon",
-                            tint = CyberPrimary,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -172,7 +172,7 @@ fun PermissionScreen(
                     text = "Grant Photo Library Access",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 22.sp,
-                    color = OnDarkBackground,
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = (-0.5).sp
                 )
@@ -182,7 +182,7 @@ fun PermissionScreen(
                 Text(
                     text = "To locate duplicates and blurry pictures, Smart Cleaner requires permission to scan photos on this device's internal storage.",
                     fontSize = 14.sp,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     lineHeight = 22.sp,
                     modifier = Modifier.padding(horizontal = 12.dp)
@@ -192,7 +192,7 @@ fun PermissionScreen(
 
                 // Privacy Indicator Card
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     border = BorderStroke(1.dp, Color(0x12FFFFFF)),
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -204,7 +204,7 @@ fun PermissionScreen(
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = "Security Guard Icon",
-                            tint = CyberPrimary,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
@@ -213,12 +213,12 @@ fun PermissionScreen(
                                 text = "100% Secure & On-Device",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp,
-                                color = OnDarkBackground
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 text = "No personal images are ever processed or uploaded off your phone.",
                                 fontSize = 11.sp,
-                                color = TextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -241,8 +241,8 @@ fun PermissionScreen(
                     ) {
                         if (showRationale) {
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = DarkSurfaceVariant),
-                                border = BorderStroke(1.dp, CyberPrimary.copy(alpha = 0.2f)),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
                                 shape = RoundedCornerShape(16.dp),
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -255,7 +255,7 @@ fun PermissionScreen(
                                     Icon(
                                         imageVector = Icons.Default.Info,
                                         contentDescription = "Info Rationale",
-                                        tint = CyberPrimary,
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier
                                             .size(16.dp)
                                             .padding(top = 2.dp)
@@ -264,7 +264,7 @@ fun PermissionScreen(
                                     Text(
                                         text = "Smart Cleaner utilizes machine learning locally. Without permission, the app cannot scan or save space.",
                                         fontSize = 11.sp,
-                                        color = OnDarkBackground,
+                                        color = MaterialTheme.colorScheme.onBackground,
                                         lineHeight = 16.sp
                                     )
                                 }
@@ -288,8 +288,8 @@ fun PermissionScreen(
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = CyberPrimary,
-                                    contentColor = OnCyberPrimary
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
                                 ),
                                 shape = RoundedCornerShape(20.dp),
                                 modifier = Modifier
@@ -309,8 +309,8 @@ fun PermissionScreen(
                             Button(
                                 onClick = { permissionState.launchMultiplePermissionRequest() },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = CyberPrimary,
-                                    contentColor = OnCyberPrimary
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
                                 ),
                                 shape = RoundedCornerShape(20.dp),
                                 modifier = Modifier
