@@ -17,14 +17,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
-      - name: Accept Android SDK licences and install compile SDK
-        run: |
-          yes | sdkmanager --licenses >/dev/null
-          sdkmanager --install "platforms;android-36.1" "build-tools;36.0.0" "platform-tools"
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platforms;android-36.1
+            build-tools;36.0.0
+            platform-tools
+      - name: Accept Android SDK licences
+        run: yes | sdkmanager --licenses
       - name: Create disposable debug signing key
         run: |
           keytool -genkeypair -v -keystore debug.keystore -storepass android \
