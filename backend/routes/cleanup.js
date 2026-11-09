@@ -17,14 +17,14 @@ router.post('/log', authenticateJWT, async (req, res) => {
       category: category.trim(),
       bytesFreed,
     });
-    await log.save();
+    const savedLog = await log.save();
     return res.status(201).json({
       success: true,
       log: {
-        id: log._id,
-        category: log.category,
-        bytesFreed: log.bytesFreed,
-        timestamp: log.createdAt,
+        id: savedLog?._id || log._id,
+        category: savedLog?.category || log.category,
+        bytesFreed: savedLog?.bytesFreed ?? log.bytesFreed,
+        timestamp: savedLog?.createdAt || log.createdAt,
       },
     });
   } catch (error) {

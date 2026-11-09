@@ -81,14 +81,14 @@ Recommend a priority hierarchy. Advise reviewing cache and temporary files first
       totalSizeBytes,
       recommendations,
     });
-    await newSession.save();
+    const savedSession = await newSession.save();
 
     return res.json({
-      sessionId: newSession._id,
+      sessionId: savedSession?._id || newSession._id,
       totalSizeBytes,
       totalSizeFormatted: totalSizeStr,
       recommendations,
-      createdAt: newSession.createdAt,
+      createdAt: savedSession?.createdAt || newSession.createdAt,
     });
   } catch (error) {
     console.error('Failed to process scan stats:', error.message);
