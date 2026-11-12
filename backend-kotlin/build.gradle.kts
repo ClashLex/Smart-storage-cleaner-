@@ -10,6 +10,7 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation-jvm:3.3.1")
     implementation("io.ktor:ktor-serialization-gson-jvm:3.3.1")
     implementation("ch.qos.logback:logback-classic:1.5.18")
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit5"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 tasks.test { useJUnitPlatform() }
