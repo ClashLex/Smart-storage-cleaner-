@@ -8,41 +8,25 @@ const SubscriptionSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    orderId: {
-      type: String,
-      trim: true,
-    },
+    orderId: { type: String, trim: true },
     purchaseToken: {
       type: String,
       required: true,
-      unique: true, // Unique index to prevent replay attacks
+      unique: true,
       index: true,
     },
-    productId: {
-      type: String,
-      required: true,
-    },
+    productId: { type: String, required: true, trim: true },
     status: {
       type: String,
-      enum: ['active', 'expired', 'cancelled', 'refunded'],
+      enum: ['active', 'pending', 'expired', 'cancelled', 'refunded'],
       default: 'active',
       index: true,
     },
-    expiryTime: {
-      type: Date,
-      required: true,
-      index: true,
-    },
-    rawVerificationData: {
-      type: mongoose.Schema.Types.Mixed,
-    },
+    expiryTime: { type: Date, required: true, index: true },
+    rawVerificationData: { type: mongoose.Schema.Types.Mixed, select: false },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// Indexes for fast querying of dynamic status & expiry conditions
 SubscriptionSchema.index({ status: 1, expiryTime: 1 });
-
 module.exports = mongoose.model('Subscription', SubscriptionSchema);

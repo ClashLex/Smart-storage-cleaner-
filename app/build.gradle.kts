@@ -16,35 +16,41 @@ android {
     targetSdk = 36
     versionCode = 1
     versionName = "1.0"
-
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    val apiBaseUrl = (project.findProperty("API_BASE_URL") as String?)
+      ?: "http://10.0.2.2:3000/"
+    val googleWebClientId = (project.findProperty("GOOGLE_WEB_CLIENT_ID") as String?) ?: ""
+    buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+    buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
   }
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
-      storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
-      keyPassword = System.getenv("KEY_PASSWORD")
-    }
-    create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
-      storePassword = "android"
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
+      val keystorePath = System.getenv("KEYSTORE_PATH")
+      val storePasswordValue = System.getenv("STORE_PASSWORD")
+      val keyPasswordValue = System.getenv("KEY_PASSWORD")
+      val aliasValue = System.getenv("KEY_ALIAS")
+      if (!keystorePath.isNullOrBlank() && !storePasswordValue.isNullOrBlank() &&
+          !keyPasswordValue.isNullOrBlank() && !aliasValue.isNullOrBlank()) {
+        storeFile = file(keystorePath)
+        storePassword = storePasswordValue
+        keyAlias = aliasValue
+        keyPassword = keyPasswordValue
+      }
     }
   }
 
   buildTypes {
+    debug {
+      // Use Gradle's standard debug signing configuration.
+    }
     release {
       isCrunchPngs = false
-      isMinifyEnabled = false
+      isMinifyEnabled = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      signingConfig = signingConfigs.getByName("release")
-    }
-    debug {
-      signingConfig = signingConfigs.getByName("debugConfig")
+      val signingReady = listOf("KEYSTORE_PATH", "STORE_PASSWORD", "KEY_PASSWORD", "KEY_ALIAS")
+        .all { !System.getenv(it).isNullOrBlank() }
+      if (signingReady) signingConfig = signingConfigs.getByName("release")
     }
   }
   compileOptions {
@@ -58,24 +64,16 @@ android {
   testOptions { unitTests { isIncludeAndroidResources = true } }
 }
 
-// Configure the Secrets Gradle Plugin to use .env and .env.example files
-// to match the convention used in Web projects.
 secrets {
   propertiesFileName = ".env"
   defaultPropertiesFileName = ".env.example"
 }
 
-// Some unused dependencies are commented out below instead of being removed.
-// This makes it easy to add them back in the future if needed.
 dependencies {
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
   implementation(libs.accompanist.permissions)
   implementation(libs.androidx.activity.compose)
-  // implementation(libs.androidx.camera.camera2)
-  // implementation(libs.androidx.camera.core)
-  // implementation(libs.androidx.camera.lifecycle)
-  // implementation(libs.androidx.camera.view)
   implementation(libs.androidx.compose.material.icons.core)
   implementation(libs.androidx.compose.material.icons.extended)
   implementation(libs.androidx.compose.material3)
@@ -92,29 +90,18 @@ dependencies {
   implementation(libs.androidx.room.runtime)
   implementation(libs.coil.compose)
   implementation(libs.converter.moshi)
-  // implementation(libs.firebase.ai)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.logging.interceptor)
   implementation(libs.moshi.kotlin)
   implementation(libs.okhttp)
-  // implementation(libs.play.services.location)
   implementation(libs.retrofit)
-
-  // Authentication & Credential Manager
   implementation("com.google.firebase:firebase-auth:23.1.0")
-  implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
   implementation("androidx.credentials:credentials:1.3.0")
   implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
   implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
-
-  // TensorFlow Lite
   implementation("org.tensorflow:tensorflow-lite:2.5.0")
-
-  // Background Work & Scheduling
   implementation("androidx.work:work-runtime-ktx:2.9.1")
-
-  // Play Billing v6
   implementation("com.android.billingclient:billing-ktx:6.2.1")
   testImplementation(libs.androidx.compose.ui.test.junit4)
   testImplementation(libs.androidx.core)

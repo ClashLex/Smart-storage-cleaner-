@@ -4,38 +4,32 @@ const { authenticateJWT } = require('../middleware/auth');
 
 const router = express.Router();
 
-/**
- * POST /api/cleanup/log
- * Log bytes freed from a successful storage cleanup.
- */
 router.post('/log', authenticateJWT, async (req, res) => {
-  const { category, bytesFreed } = req.body;
-
-  if (!category || typeof bytesFreed !== 'number' || bytesFreed < 0) {
-    return res.status(400).json({ error: 'Invalid parameters. Requires a valid category and a non-negative bytesFreed number.' });
+  const { category, bytesFreed } = req.body || {};
+  if (typeof category !== 'string' || !category.trim() || category.trim().length > 64 ||
+      !Number.isSafeInteger(bytesFreed) || bytesFreed < 0) {
+    return res.status(400).json({ error: 'Requires a category (1-64 characters) and a non-negative safe-integer bytesFreed value.' });
   }
 
   try {
     const log = new CleanupLog({
       userId: req.user._id,
-      category,
+      category: category.trim(),
       bytesFreed,
     });
-
-    await log.save();
-
-    res.status(201).json({
+    const savedLog = await log.save();
+    return res.status(201).json({
       success: true,
       log: {
-        id: log._id,
-        category: log.category,
-        bytesFreed: log.bytesFreed,
-        timestamp: log.createdAt,
+        id: savedLog?._id || log._id,
+        category: savedLog?.category || log.category,
+        bytesFreed: savedLog?.bytesFreed ?? log.bytesFreed,
+        timestamp: savedLog?.createdAt || log.createdAt,
       },
     });
   } catch (error) {
-    console.error('Error logging cleanup data:', error);
-    res.status(500).json({ error: 'Failed to record cleanup log metrics.' });
+    console.error('Error logging cleanup data:', error.message);
+    return res.status(500).json({ error: 'Failed to record cleanup log metrics.' });
   }
 });
 

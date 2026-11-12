@@ -7,25 +7,17 @@ interface SubRecord {
   email?: string;
   productId: string;
   orderId: string;
-  status: 'active' | 'cancelled' | 'expired';
+  status: 'active' | 'pending' | 'cancelled' | 'expired' | 'refunded';
   expiryTime: string;
   createdAt: string;
 }
-
-const mockSubscriptionRecords: SubRecord[] = [
-  { _id: 'sub-7391', userId: 'usr-1', email: 'ansilmuhammed919@gmail.com', productId: 'premium_annual', orderId: 'GPA.5539-2183-1123', status: 'active', expiryTime: '2027-05-15 12:00', createdAt: '2026-05-15' },
-  { _id: 'sub-4822', userId: 'usr-2', email: 'leila.vance@gmail.com', productId: 'premium_monthly', orderId: 'GPA.1232-4412-8821', status: 'active', expiryTime: '2026-06-01 15:30', createdAt: '2026-05-01' },
-  { _id: 'sub-9402', userId: 'usr-4', email: 'sarah.j@outlook.com', productId: 'premium_weekly', orderId: 'GPA.9042-3321-4122', status: 'cancelled', expiryTime: '2026-04-27 20:00', createdAt: '2026-04-20' },
-  { _id: 'sub-1833', userId: 'usr-6', email: 'elena.rostova@yandex.com', productId: 'premium_monthly', orderId: 'GPA.5023-1104-9281', status: 'active', expiryTime: '2026-06-05 10:15', createdAt: '2026-05-05' },
-  { _id: 'sub-2342', userId: 'usr-9', email: 'tanaka.a@sony.co.jp', productId: 'premium_annual', orderId: 'GPA.7781-3042-5521', status: 'expired', expiryTime: '2026-05-10 14:00', createdAt: '2025-05-10' },
-];
 
 interface SubscriptionsProps {
   token: string;
 }
 
 export default function Subscriptions({ token }: SubscriptionsProps) {
-  const [subs, setSubs] = useState<SubRecord[]>(mockSubscriptionRecords);
+  const [subs, setSubs] = useState<SubRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'cancelled' | 'expired'>('all');
@@ -42,11 +34,10 @@ export default function Subscriptions({ token }: SubscriptionsProps) {
       if (response.ok) {
         const data = await response.json();
         // Decorate returned subs with fallback labels for email if mismatch
-        setSubs(data.subscriptions || mockSubscriptionRecords);
+        setSubs(Array.isArray(data.subscriptions) ? data.subscriptions : []);
       }
     } catch (_) {
-      // Offline fallback
-      setSubs(mockSubscriptionRecords);
+      setSubs([]);
     } finally {
       setLoading(false);
     }
